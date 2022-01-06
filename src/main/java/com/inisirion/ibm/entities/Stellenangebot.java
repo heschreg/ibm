@@ -57,9 +57,9 @@ public class Stellenangebot {
 	@ManyToMany (fetch = FetchType.LAZY)
 	@JoinTable  (name = "stellenangebot_kanal",
 			joinColumns = {@JoinColumn (name = "stellenangebot_id", referencedColumnName = "id", nullable = false, updatable = false)},
-			inverseJoinColumns = {@JoinColumn (name = "kanal_id",   referencedColumnName = "id", nullable = false, updatable = false)}					
+			inverseJoinColumns = {@JoinColumn (name = "sd_kanal_id",   referencedColumnName = "id", nullable = false, updatable = false)}					
 	)
-	private List <Kanal> kanaele  = new ArrayList<>();
+	private List <SD_Kanal> kanaele  = new ArrayList<>();
 	
 	
 	public long getId() {
@@ -73,6 +73,7 @@ public class Stellenangebot {
 	public String getBezeichnung() {
 		return bezeichnung;
 	}
+
 
 	public void setBezeichnung(String bezeichnung) {
 		this.bezeichnung = bezeichnung;
@@ -114,6 +115,7 @@ public class Stellenangebot {
 		
 	}	
 
+	// Der Kanal, der zur Bewerbung bzw. zur Einstellung geführt hat
 	public SD_Kanal getSd_kanal() {
 		return sd_kanal;
 	}
@@ -122,7 +124,17 @@ public class Stellenangebot {
 		this.sd_kanal = sd_kanal;
 	}
 
+	// Die Liste aller zugeordneten Kanäle
+	public List<SD_Kanal> getKanaele() {
+		return kanaele;
+	}
+
+	public void setKanaele(List<SD_Kanal> kanaele) {
+		this.kanaele = kanaele;
+	}
 	
+	
+	/*
 	public List<Kanal> getKanaele() {
 		return kanaele;
 	}
@@ -139,4 +151,6 @@ public class Stellenangebot {
 	public void removeKanal( Kanal kanal) {
 		this.kanaele.remove(kanal);
 	}
+	*/
+	
 }

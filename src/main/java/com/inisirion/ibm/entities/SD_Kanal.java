@@ -1,15 +1,21 @@
 package com.inisirion.ibm.entities;
 
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 
 @Entity
 @Table(name = "SD_Kanal")
-public class SD_Kanal {
+public class SD_Kanal implements Serializable {
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -18,6 +24,10 @@ public class SD_Kanal {
 	@Column(name = "bezeichnung", nullable=false)
 	private String bezeichnung;
 	
+	// 1 Kanal kann in vielen Stellenangeboten verwendet werden
+	// 1 Stellenangebot kann viele Kanäle verwenden
+	@ManyToMany(mappedBy = "kanaele",fetch = FetchType.LAZY)
+	private List <Stellenangebot>  stellenangebote = new ArrayList <>();
 	
 	public SD_Kanal() {
 		
