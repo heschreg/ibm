@@ -1,5 +1,6 @@
 package com.inisirion.ibm.entities;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
@@ -36,8 +37,7 @@ public class Stellenangebot {
 
 	@Column(name = "ende")
 	private Date ende;
-	
-	
+		
 	@Column(name = "notizen")
 	private String notizen;
 	
@@ -54,12 +54,15 @@ public class Stellenangebot {
 	// Eine Stellenanzeige wird auf mehreren Kanälen geschalten
 	// Ein Kanal wird in mehreren Stellenanzeigen verwendet ==> ManyToMany-Beziehung
 	
-	@ManyToMany (fetch = FetchType.LAZY)
+	@ManyToMany (fetch = FetchType.EAGER)
 	@JoinTable  (name = "stellenangebot_kanal",
 			joinColumns = {@JoinColumn (name = "stellenangebot_id", referencedColumnName = "id", nullable = false, updatable = false)},
 			inverseJoinColumns = {@JoinColumn (name = "sd_kanal_id",   referencedColumnName = "id", nullable = false, updatable = false)}					
 	)
 	private List <SD_Kanal> kanaele  = new ArrayList<>();
+	
+	
+	public Stellenangebot() {}	
 	
 	
 	public long getId() {
@@ -70,15 +73,16 @@ public class Stellenangebot {
 		this.id = id;
 	}
 
+
 	public String getBezeichnung() {
 		return bezeichnung;
 	}
-
 
 	public void setBezeichnung(String bezeichnung) {
 		this.bezeichnung = bezeichnung;
 	}
 
+	
 	public Date getBeginn() {
 		return beginn;
 	}
@@ -87,6 +91,7 @@ public class Stellenangebot {
 		this.beginn = beginn;
 	}
 
+	
 	public Date getEnde() {
 		return ende;
 	}
@@ -95,6 +100,7 @@ public class Stellenangebot {
 		this.ende = ende;
 	}
 
+	
 	public String getNotizen() {
 		return notizen;
 	}
@@ -111,9 +117,6 @@ public class Stellenangebot {
 		this.sd_status = sd_status;
 	}
 
-	public Stellenangebot() {
-		
-	}	
 
 	// Der Kanal, der zur Bewerbung bzw. zur Einstellung geführt hat
 	public SD_Kanal getSd_kanal() {
@@ -133,24 +136,11 @@ public class Stellenangebot {
 		this.kanaele = kanaele;
 	}
 	
-	
-	/*
-	public List<Kanal> getKanaele() {
-		return kanaele;
-	}
-
-	public void setKanaele(List<Kanal> kanaele) {
-		this.kanaele = kanaele;
-	}
-	
-	
-	public void addKanal( Kanal kanal) {
+	public void addKanal( SD_Kanal kanal) {
 		this.kanaele.add(kanal);
 	}
 	
-	public void removeKanal( Kanal kanal) {
+	public void removeKanal( SD_Kanal kanal) {
 		this.kanaele.remove(kanal);
 	}
-	*/
-	
 }

@@ -12,11 +12,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
-import com.inisirion.ibm.entities.Kanal;
 import com.inisirion.ibm.entities.SD_Kanal;
 import com.inisirion.ibm.entities.SD_Status;
 import com.inisirion.ibm.entities.Stellenangebot;
-import com.inisirion.ibm.repository.KanalRepository;
 import com.inisirion.ibm.repository.SD_KanalRepository;
 import com.inisirion.ibm.repository.SD_StatusRepository;
 import com.inisirion.ibm.repository.StellenangebotRepository;
@@ -40,10 +38,6 @@ public class IbmApplication {
 		
 		@Autowired 
 		private StellenangebotRepository stellenangebotRepository;	
-
-		@Autowired 
-		private KanalRepository kanalRepository;	
-		
 
 		@Override
 		public void run(String... args) throws Exception {
@@ -76,14 +70,13 @@ public class IbmApplication {
 			// nach einer evtl. Einstellung: der Kanal, der zum ERfolg führte
 			Optional<SD_Kanal>  sd_kanal_success_opt  = sdKanalRepository.findById(1L);
 
-			// Liste mit allen Kanälen aufbauen, die im konkreten Stellenangebot geschaltet wurden
-			// // Die Liste aller zugeordneten Kanäle
-			// public List<SD_Kanal> getKanaele() {
+			// Liste mit allen Kanälen aufbauen, die im konkreten Stellenangebot geschaltet werden
+			// Die Liste aller zugeordneten Kanäle
 			List<SD_Kanal> kanaele = new ArrayList<>();
 			kanaele.add(sdKanalRepository.findById(2L).get());
 						
 			Stellenangebot stellenangebot = new Stellenangebot();
-			stellenangebot.setBezeichnung("Erste Stellenanzeige");
+			stellenangebot.setBezeichnung("Fullstack Entwickler");
 			stellenangebot.setBeginn(new Date());
 			stellenangebot.setEnde(new Date());
 			stellenangebot.setNotizen("das ist meine erste Notiz");
@@ -92,6 +85,7 @@ public class IbmApplication {
 			stellenangebot.setKanaele(kanaele);
 			
 			stellenangebotRepository.save(stellenangebot);
+
 			
 			// **** Stellenangebot 2 *****
 									
@@ -104,7 +98,7 @@ public class IbmApplication {
 			kanaele.add(sdKanalRepository.findById(4L).get());
 						
 			stellenangebot = new Stellenangebot();			
-			stellenangebot.setBezeichnung("zweite Stellenanzeige");
+			stellenangebot.setBezeichnung("Angular Entwickler");
 			stellenangebot.setBeginn(new Date());
 			stellenangebot.setEnde(new Date());
 			stellenangebot.setNotizen("das ist meine zweite Notiz");
@@ -127,7 +121,7 @@ public class IbmApplication {
 			kanaele.add(sdKanalRepository.findById(4L).get());
 
 			stellenangebot = new Stellenangebot();			
-			stellenangebot.setBezeichnung("dritte Stellenanzeige");
+			stellenangebot.setBezeichnung("Datenbankspezialisten");
 			stellenangebot.setBeginn(new Date());
 			stellenangebot.setEnde(new Date());
 			stellenangebot.setNotizen("das ist meine dritte Notiz");
@@ -136,8 +130,9 @@ public class IbmApplication {
 			stellenangebot.setKanaele(kanaele);
 			
 			stellenangebotRepository.save(stellenangebot);
-		}
-				
+			
+			Stellenangebot sa = stellenangebotRepository.findById(3L).get();
+			
+		}				
 	}
-
 }

@@ -15,7 +15,7 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "SD_Kanal")
-public class SD_Kanal implements Serializable {
+public class SD_Kanal {
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,16 +29,37 @@ public class SD_Kanal implements Serializable {
 	@ManyToMany(mappedBy = "kanaele",fetch = FetchType.LAZY)
 	private List <Stellenangebot>  stellenangebote = new ArrayList <>();
 	
-	public SD_Kanal() {
-		
-	}
-
+	public SD_Kanal() {}
 
 	public SD_Kanal(long id, String bezeichnung) {
-		this.id = id;
+		super();
 		this.bezeichnung = bezeichnung;
-	}		
-	
-	
+	}
 
+	public long getId() {
+		return id;
+	}
+
+	public void setId(long id) {
+		this.id = id;
+	}
+
+	public String getBezeichnung() {
+		return bezeichnung;
+	}
+
+	public void setBezeichnung(String bezeichnung) {
+		this.bezeichnung = bezeichnung;
+	}
+
+	/*
+	public List<Stellenangebot> getStellenangebote() {
+		return stellenangebote;
+	}
+
+	public void setStellenangebote(List<Stellenangebot> stellenangebote) {
+		this.stellenangebote = stellenangebote;
+	}
+	*/		
+	
 }

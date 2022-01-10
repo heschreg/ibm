@@ -1,5 +1,7 @@
 package com.inisirion.ibm.entities;
 
+import java.io.Serializable;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -9,7 +11,7 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "SD_Status")
-public class SD_Status {
+public class SD_Status  {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,9 +32,22 @@ public class SD_Status {
 	public SD_Status(long id, String bezeichnung) {
 		this.id = id;
 		this.bezeichnung = bezeichnung;
-	}		
+	}
 
-	
-	
-	
+	public long getId() {
+		return id;
+	}
+
+	public void setId(long id) {
+		this.id = id;
+	}
+
+	public String getBezeichnung() {
+		return bezeichnung;
+	}
+
+	public void setBezeichnung(String bezeichnung) {
+		this.bezeichnung = bezeichnung;
+	}		
+		
 }
