@@ -12,9 +12,11 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
+import com.inisirion.ibm.entities.Pdf_Stellenangebot;
 import com.inisirion.ibm.entities.SD_Kanal;
 import com.inisirion.ibm.entities.SD_Status;
 import com.inisirion.ibm.entities.Stellenangebot;
+import com.inisirion.ibm.repository.Pdf_StellenangebotRepository;
 import com.inisirion.ibm.repository.SD_KanalRepository;
 import com.inisirion.ibm.repository.SD_StatusRepository;
 import com.inisirion.ibm.repository.StellenangebotRepository;
@@ -39,6 +41,10 @@ public class IbmApplication {
 		@Autowired 
 		private StellenangebotRepository stellenangebotRepository;	
 
+		@Autowired 
+		private Pdf_StellenangebotRepository pdf_stellenangebotRepository;	
+		
+		
 		@Override
 		public void run(String... args) throws Exception {
 
@@ -56,11 +62,11 @@ public class IbmApplication {
 			sdKanalRepository.save(new SD_Kanal(555552L, "Jobbörse"));
 			sdKanalRepository.save(new SD_Kanal(555553L, "Xing"));
 			sdKanalRepository.save(new SD_Kanal(555554L, "LinkedIn"));
-			
+					
 
-			///////////////////////////////////
-			// Anlegen von Stellenangeboten 
-			///////////////////////////////////
+			////////////////////////////////
+			// Anlage von 3 Stellenangeboten 
+			////////////////////////////////
 			
 			// *** Stellenangebot 1 *****
 			
@@ -74,7 +80,7 @@ public class IbmApplication {
 			// Die Liste aller zugeordneten Kanäle
 			List<SD_Kanal> kanaele = new ArrayList<>();
 			kanaele.add(sdKanalRepository.findById(2L).get());
-						
+			
 			Stellenangebot stellenangebot = new Stellenangebot();
 			stellenangebot.setBezeichnung("Fullstack Entwickler");
 			stellenangebot.setBeginn(new Date());
@@ -83,6 +89,12 @@ public class IbmApplication {
 			stellenangebot.setSd_status(sd_status_opt.get());
 			stellenangebot.setSd_kanal(sd_kanal_success_opt.get());
 			stellenangebot.setKanaele(kanaele);
+						
+			// Man muss zunächst in der Tabelle "pdf_Stellenangebot" für jedes Stellenangebot 
+			// einen (leeren9 Eintrag hinterlegen, auch wenn niemals ein echtes pdf-Dokument hintergelegt wird.
+			Pdf_Stellenangebot pdf_sa1 = new Pdf_Stellenangebot();
+			pdf_stellenangebotRepository.save(pdf_sa1);
+			stellenangebot.setPdf_stellenangebot(pdf_sa1);
 			
 			stellenangebotRepository.save(stellenangebot);
 
@@ -105,6 +117,12 @@ public class IbmApplication {
 			stellenangebot.setSd_status(sd_status_opt.get());
 			stellenangebot.setSd_kanal(sd_kanal_success_opt.get());
 			stellenangebot.setKanaele(kanaele);
+
+			// Man muss zunächst in der Tabelle "pdf_Stellenangebot" für jedes Stellenangebot 
+			// einen (leeren9 Eintrag hinterlegen, auch wenn niemals ein echtes pdf-Dokument hintergelegt wird.
+			Pdf_Stellenangebot pdf_sa2 = new Pdf_Stellenangebot();
+			pdf_stellenangebotRepository.save(pdf_sa2);
+			stellenangebot.setPdf_stellenangebot(pdf_sa2);
 			
 			stellenangebotRepository.save(stellenangebot);
 						
@@ -128,6 +146,12 @@ public class IbmApplication {
 			stellenangebot.setSd_status(sd_status_opt.get());
 			stellenangebot.setSd_kanal(sd_kanal_success_opt.get());
 			stellenangebot.setKanaele(kanaele);
+
+			// Man muss zunächst in der Tabelle "pdf_Stellenangebot" für jedes Stellenangebot 
+			// einen (leeren9 Eintrag hinterlegen, auch wenn niemals ein echtes pdf-Dokument hintergelegt wird.
+			Pdf_Stellenangebot pdf_sa3 = new Pdf_Stellenangebot();
+			pdf_stellenangebotRepository.save(pdf_sa3);
+			stellenangebot.setPdf_stellenangebot(pdf_sa3);
 			
 			stellenangebotRepository.save(stellenangebot);
 			

@@ -60,6 +60,16 @@ public class Stellenangebot {
 			inverseJoinColumns = {@JoinColumn (name = "sd_kanal_id",   referencedColumnName = "id", nullable = false, updatable = false)}					
 	)
 	private List <SD_Kanal> kanaele  = new ArrayList<>();
+
+	// Falls ein Stellenagebot als PDF vorliegt, kann man dieses hier mit hinterlegen
+	// In dieser Entität(Stellenangebot) wird dadurch ein Feld "pdf_stellenangebot_id", 
+	// das mit dem Feld "id" in der Tabelle "Pdf_STellenangebot" verknüpft ist
+	@OneToOne
+	@JoinColumn (name = "pdf_stellenangebot_id", nullable = false)
+	private Pdf_Stellenangebot pdf_stellenangebot;
+	
+
+	// === Constructors: =====================
 	
 	
 	public Stellenangebot() {}	
@@ -143,4 +153,17 @@ public class Stellenangebot {
 	public void removeKanal( SD_Kanal kanal) {
 		this.kanaele.remove(kanal);
 	}
+
+
+	// Handling des zugeoirdnetn pdf-Dokumentes
+	public Pdf_Stellenangebot getPdf_stellenangebot() {
+		return pdf_stellenangebot;
+	}
+
+
+	public void setPdf_stellenangebot(Pdf_Stellenangebot pdf_stellenangebot) {
+		this.pdf_stellenangebot = pdf_stellenangebot;
+	}
+	
+	
 }

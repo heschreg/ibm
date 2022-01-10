@@ -46,6 +46,147 @@ public class IbmRestController {
 	@Autowired
 	private  Pdf_StellenangebotRepository pdf_StellenangebotRepository;
 	
+	// =======================================================
+
+	// Holen aller Stammdaten für Status 
+	@GetMapping("/sd_status")
+	@CrossOrigin(origins = "http://localhost:4200")
+	public List<SD_Status> getAllStatus(){
+		List<SD_Status> list_status = sd_StatusRepository.findAll();		
+		return list_status;
+	}
+
+	// Holen aller Stammdaten für Kanäle 
+	@GetMapping("/sd_kanaele")
+	@CrossOrigin(origins = "http://localhost:4200")
+	public List<SD_Kanal> getAllKanaele(){
+		List<SD_Kanal> list_kanaele = sd_KanalRepository.findAll();	
+		return list_kanaele;
+	}		
+	
+	// get alle Stellenangebote
+	@GetMapping("/stellenangebot")
+	public List<Stellenangebot> getAllStellenangebote(){		
+		List<Stellenangebot> list_stellenangebote = stellenangebotRepository.findAll();		
+		return list_stellenangebote;
+	}		
+
+	// get employee by id rest api
+	@GetMapping("/stellenangebot/{id}")
+	public ResponseEntity<Stellenangebot> getStellenangebotById(@PathVariable Long id) {
+		
+		Optional<Stellenangebot> stellenangebot_opt = stellenangebotRepository.findById(id);		
+		Stellenangebot stellenangebot = stellenangebot_opt.get();
+		
+		/*
+		String json = null;
+		try {
+			json = new ObjectMapper().writeValueAsString(stellenangebot);
+		} catch (JsonProcessingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+        System.out.println(json);
+        */
+		
+		return ResponseEntity.ok(stellenangebot);
+	}
+	
+	// Anlage eine
+	@PostMapping(path= "/stellenangebot", consumes = "application/json", produces = "application/json")
+	public Stellenangebot createStellenangebot(@RequestBody Stellenangebot stellenangebot) {
+		return stellenangebotRepository.save(stellenangebot);
+	}
+
+	@PostMapping("/stellenangebot/{id}")
+	public ResponseEntity<Stellenangebot> postStellenangebot(@PathVariable Long id, @RequestBody Stellenangebot stellenangebotDetails){
+		
+		// Holen des Stellenangebotes, in dem etwas upzudaten ist
+		Optional<Stellenangebot> stellenangebot_opt = stellenangebotRepository.findById(id);
+		 	// .orElseThrow(() -> new ResourceNotFoundException("Employee not exist with id :" + id));
+		
+		Stellenangebot stellenangebot = stellenangebot_opt.get();
+		
+		// stellenangebot.setBeginn(stellenangebotDetails.getBeginn());
+		stellenangebot.setBezeichnung(stellenangebotDetails.getBezeichnung());
+		// stellenangebot.setEnde(stellenangebotDetails.getEnde());
+		
+		stellenangebot.setKanaele(stellenangebotDetails.getKanaele());
+		stellenangebot.setNotizen(stellenangebotDetails.getNotizen());
+		stellenangebot.setSd_kanal(stellenangebotDetails.getSd_kanal());
+		stellenangebot.setSd_status(stellenangebotDetails.getSd_status());
+		
+		// Hintrlegen eines evtl ausgewählten pdf-Dokumentes mit der Stellenanzeige als Inhalt
+		
+				
+		Stellenangebot updatedStellenangebot = stellenangebotRepository.save(stellenangebot);
+		
+		ResponseEntity<Stellenangebot> sa = ResponseEntity.ok(updatedStellenangebot);
+		
+		return sa;
+	}
+	
+	
+	@PutMapping("/stellenangebot/{id}")
+	public ResponseEntity<Stellenangebot> updateStellenangebot(@PathVariable Long id, @RequestBody Stellenangebot stellenangebotDetails){
+		
+		Optional<Stellenangebot> stellenangebot_opt = stellenangebotRepository.findById(id);
+		 	// .orElseThrow(() -> new ResourceNotFoundException("Employee not exist with id :" + id));
+		
+		Stellenangebot stellenangebot = stellenangebot_opt.get();
+		
+		// stellenangebot.setBeginn(stellenangebotDetails.getBeginn());
+		stellenangebot.setBezeichnung(stellenangebotDetails.getBezeichnung());
+		// stellenangebot.setEnde(stellenangebotDetails.getEnde());
+		
+		stellenangebot.setKanaele(stellenangebotDetails.getKanaele());
+		stellenangebot.setNotizen(stellenangebotDetails.getNotizen());
+		stellenangebot.setSd_kanal(stellenangebotDetails.getSd_kanal());
+		stellenangebot.setSd_status(stellenangebotDetails.getSd_status());
+				
+		Stellenangebot updatedStellenangebot = stellenangebotRepository.save(stellenangebot);
+		
+		ResponseEntity<Stellenangebot> sa = ResponseEntity.ok(updatedStellenangebot);		
+		return sa;
+	}
+	
+
+	// =======================================================================
+
+	/******************************************************************************
+	 * POST: UPLOAD Pdf mit Verknüpfung zur zentralen Entität  "stellenangebot" 
+	 * Parameter 1: id des betroffenen Stellenangebots 
+	 * Parameter 2: Name der upzuloadenden pdf-Datei 
+	******************************************************************************/
+	
+	@PostMapping(path = "/uploadpdfsa/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+	public  ResponseEntity<Stellenangebot> uploadPdfSa(@PathVariable Long id, @RequestParam("pdfFile") MultipartFile pdfDatei) throws IOException {
+		
+		// Holen des betroffenen Stellenangebots anhand der übergebenen id
+		Stellenangebot stellenangebot = stellenangebotRepository.findById(id).get();
+		
+		// Verarbeiten der übergebenen PDF-Datei
+		String pdfFilename = StringUtils.cleanPath(pdfDatei.getOriginalFilename());
+		String pdfContentType = pdfDatei.getContentType();
+		byte[] pdfBytes = pdfDatei.getBytes();
+		// Pdf_Stellenangebot pdfStellenangebot = new Pdf_Stellenangebot(pdfFilename, pdfContentType, pdfDatei.getBytes());		
+		Pdf_Stellenangebot pdfStellenangebot = stellenangebot.getPdf_stellenangebot();
+		
+		pdfStellenangebot.setName(pdfFilename);
+		pdfStellenangebot.setType(pdfContentType);
+		pdfStellenangebot.setBinData(pdfBytes);		
+		pdf_StellenangebotRepository.save(pdfStellenangebot);
+		
+		// Hinterlegen der pdf-Daten in der Property, die den Eintrag in der Tabelle "pdf_stellenangebot" beinhaltet +  Updaten
+		stellenangebot.setPdf_stellenangebot(pdfStellenangebot);
+		Stellenangebot updatedStellenangebot = stellenangebotRepository.save(stellenangebot);
+		
+		ResponseEntity<Stellenangebot> sa = ResponseEntity.ok(updatedStellenangebot);		
+		return sa;		
+	}
+	
+	
 	/**********************/
 	/** POST: UPLOAD Pdf **/
 	/**********************/
@@ -144,114 +285,6 @@ public class IbmRestController {
 	    return bbytes;	   
 	}	
 		
-	// =======================================================
-
-	// Holen aller Stammdaten für Status 
-	@GetMapping("/sd_status")
-	@CrossOrigin(origins = "http://localhost:4200")
-	public List<SD_Status> getAllStatus(){
-		List<SD_Status> list_status = sd_StatusRepository.findAll();		
-		return list_status;
-	}
-
-	// Holen aller Stammdaten für Kanäle 
-	@GetMapping("/sd_kanaele")
-	@CrossOrigin(origins = "http://localhost:4200")
-	public List<SD_Kanal> getAllKanaele(){
-		List<SD_Kanal> list_kanaele = sd_KanalRepository.findAll();	
-		return list_kanaele;
-	}		
 	
-	// get alle Stellenangebote
-	@GetMapping("/stellenangebot")
-	public List<Stellenangebot> getAllStellenangebote(){		
-		List<Stellenangebot> list_stellenangebote = stellenangebotRepository.findAll();		
-		return list_stellenangebote;
-	}		
-
-	// get employee by id rest api
-	@GetMapping("/stellenangebot/{id}")
-	public ResponseEntity<Stellenangebot> getStellenangebotById(@PathVariable Long id) {
-		
-		Optional<Stellenangebot> stellenangebot_opt = stellenangebotRepository.findById(id);		
-		Stellenangebot stellenangebot = stellenangebot_opt.get();
-		
-		/*
-		String json = null;
-		try {
-			json = new ObjectMapper().writeValueAsString(stellenangebot);
-		} catch (JsonProcessingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-        System.out.println(json);
-        */
-		
-		return ResponseEntity.ok(stellenangebot);
-	}
-	
-	@PostMapping(path= "/stellenangebot", consumes = "application/json", produces = "application/json")
-	public Stellenangebot createStellenangebot(@RequestBody Stellenangebot stellenangebot) {
-		return stellenangebotRepository.save(stellenangebot);
-	}
-
-	@PostMapping("/stellenangebot/{id}")
-	public ResponseEntity<Stellenangebot> postStellenangebot(@PathVariable Long id, @RequestBody Stellenangebot stellenangebotDetails){
-		
-		Optional<Stellenangebot> stellenangebot_opt = stellenangebotRepository.findById(id);
-		 	// .orElseThrow(() -> new ResourceNotFoundException("Employee not exist with id :" + id));
-		
-		Stellenangebot stellenangebot = stellenangebot_opt.get();
-		
-		// stellenangebot.setBeginn(stellenangebotDetails.getBeginn());
-		stellenangebot.setBezeichnung(stellenangebotDetails.getBezeichnung());
-		// stellenangebot.setEnde(stellenangebotDetails.getEnde());
-		
-		stellenangebot.setKanaele(stellenangebotDetails.getKanaele());
-		stellenangebot.setNotizen(stellenangebotDetails.getNotizen());
-		stellenangebot.setSd_kanal(stellenangebotDetails.getSd_kanal());
-		stellenangebot.setSd_status(stellenangebotDetails.getSd_status());
-				
-		Stellenangebot updatedStellenangebot = stellenangebotRepository.save(stellenangebot);
-		
-		ResponseEntity<Stellenangebot> sa = ResponseEntity.ok(updatedStellenangebot);
-		
-		return sa;
-	}
-	
-	
-	@PutMapping("/stellenangebot/{id}")
-	public ResponseEntity<Stellenangebot> updateStellenangebot(@PathVariable Long id, @RequestBody Stellenangebot stellenangebotDetails){
-		
-		Optional<Stellenangebot> stellenangebot_opt = stellenangebotRepository.findById(id);
-		 	// .orElseThrow(() -> new ResourceNotFoundException("Employee not exist with id :" + id));
-		
-		Stellenangebot stellenangebot = stellenangebot_opt.get();
-		
-		// stellenangebot.setBeginn(stellenangebotDetails.getBeginn());
-		stellenangebot.setBezeichnung(stellenangebotDetails.getBezeichnung());
-		// stellenangebot.setEnde(stellenangebotDetails.getEnde());
-		
-		stellenangebot.setKanaele(stellenangebotDetails.getKanaele());
-		stellenangebot.setNotizen(stellenangebotDetails.getNotizen());
-		stellenangebot.setSd_kanal(stellenangebotDetails.getSd_kanal());
-		stellenangebot.setSd_status(stellenangebotDetails.getSd_status());
-				
-		Stellenangebot updatedStellenangebot = stellenangebotRepository.save(stellenangebot);
-		
-		ResponseEntity<Stellenangebot> sa = ResponseEntity.ok(updatedStellenangebot);
-		
-		return sa;
-	}
-	
-	/*
-	public ResponseEntity<Stellenangebot> addEmployee(@RequestBody Stellenangebot stellenangebot) throws Exception 
-	{ 	  
-		
-	}
-	*/      
-		
-
 	
 }
