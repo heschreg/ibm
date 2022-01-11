@@ -93,20 +93,16 @@ public class IbmRestController {
 		return ResponseEntity.ok(stellenangebot);
 	}
 	
-	// Anlage eine
+	// Inserten eines neuen Datensatzes
 	@PostMapping(path= "/stellenangebot", consumes = "application/json", produces = "application/json")
-	public Stellenangebot createStellenangebot(@RequestBody Stellenangebot stellenangebot) {
-		return stellenangebotRepository.save(stellenangebot);
-	}
+	public ResponseEntity<Stellenangebot> createStellenangebot(@RequestBody Stellenangebot stellenangebotDetails) {
 
-	@PostMapping("/stellenangebot/{id}")
-	public ResponseEntity<Stellenangebot> postStellenangebot(@PathVariable Long id, @RequestBody Stellenangebot stellenangebotDetails){
-		
-		// Holen des Stellenangebotes, in dem etwas upzudaten ist
-		Optional<Stellenangebot> stellenangebot_opt = stellenangebotRepository.findById(id);
-		 	// .orElseThrow(() -> new ResourceNotFoundException("Employee not exist with id :" + id));
-		
-		Stellenangebot stellenangebot = stellenangebot_opt.get();
+		// Instantiieren eines neuen Datensatzes
+		Stellenangebot stellenangebot = new Stellenangebot();
+
+		///////////////////////////////////////////////////////
+		// Setzen der Properties im neu anzulegenden Datensatz
+		///////////////////////////////////////////////////////
 		
 		// stellenangebot.setBeginn(stellenangebotDetails.getBeginn());
 		stellenangebot.setBezeichnung(stellenangebotDetails.getBezeichnung());
@@ -116,14 +112,41 @@ public class IbmRestController {
 		stellenangebot.setNotizen(stellenangebotDetails.getNotizen());
 		stellenangebot.setSd_kanal(stellenangebotDetails.getSd_kanal());
 		stellenangebot.setSd_status(stellenangebotDetails.getSd_status());
+	
+		Pdf_Stellenangebot pdf_sa = new Pdf_Stellenangebot();
+		pdf_StellenangebotRepository.save(pdf_sa);		
+		stellenangebot.setPdf_stellenangebot(pdf_sa);
 		
-		// Hintrlegen eines evtl ausgewählten pdf-Dokumentes mit der Stellenanzeige als Inhalt
+		Stellenangebot newStellenangebot = stellenangebotRepository.save(stellenangebot);
 		
+		ResponseEntity<Stellenangebot> sa = ResponseEntity.ok(newStellenangebot);
+		
+		return sa;
+	}
+
+	@PostMapping(path= "/stellenangebot/{id}", consumes = "application/json", produces = "application/json")
+	public ResponseEntity<Stellenangebot> postStellenangebot(@PathVariable Long id, @RequestBody Stellenangebot stellenangebotDetails){
+		
+		// Holen des Stellenangebotes, in dem etwas upzudaten ist
+		Optional<Stellenangebot> stellenangebot_opt = stellenangebotRepository.findById(id);
+		 	// .orElseThrow(() -> new ResourceNotFoundException("Employee not exist with id :" + id));		
+		Stellenangebot stellenangebot = stellenangebot_opt.get();
+		
+		///////////////////////////////////////////////////////
+		// Updaten der Properties im bestehenden Datensatz
+		///////////////////////////////////////////////////////
+		
+		// stellenangebot.setBeginn(stellenangebotDetails.getBeginn());
+		stellenangebot.setBezeichnung(stellenangebotDetails.getBezeichnung());
+		// stellenangebot.setEnde(stellenangebotDetails.getEnde());
+		
+		stellenangebot.setKanaele(stellenangebotDetails.getKanaele());
+		stellenangebot.setNotizen(stellenangebotDetails.getNotizen());
+		stellenangebot.setSd_kanal(stellenangebotDetails.getSd_kanal());
+		stellenangebot.setSd_status(stellenangebotDetails.getSd_status());
 				
-		Stellenangebot updatedStellenangebot = stellenangebotRepository.save(stellenangebot);
-		
-		ResponseEntity<Stellenangebot> sa = ResponseEntity.ok(updatedStellenangebot);
-		
+		Stellenangebot updatedStellenangebot = stellenangebotRepository.save(stellenangebot);		
+		ResponseEntity<Stellenangebot> sa = ResponseEntity.ok(updatedStellenangebot);		
 		return sa;
 	}
 	
@@ -145,8 +168,7 @@ public class IbmRestController {
 		stellenangebot.setSd_kanal(stellenangebotDetails.getSd_kanal());
 		stellenangebot.setSd_status(stellenangebotDetails.getSd_status());
 				
-		Stellenangebot updatedStellenangebot = stellenangebotRepository.save(stellenangebot);
-		
+		Stellenangebot updatedStellenangebot = stellenangebotRepository.save(stellenangebot);		
 		ResponseEntity<Stellenangebot> sa = ResponseEntity.ok(updatedStellenangebot);		
 		return sa;
 	}
@@ -185,51 +207,8 @@ public class IbmRestController {
 		ResponseEntity<Stellenangebot> sa = ResponseEntity.ok(updatedStellenangebot);		
 		return sa;		
 	}
-	
-	
-	/**********************/
-	/** POST: UPLOAD Pdf **/
-	/**********************/
-	
-	@PostMapping(path = "/uploadpdf", produces = MediaType.APPLICATION_JSON_VALUE)
-	public  ResponseEntity<Pdf_Stellenangebot> uploadPdf(@RequestParam("pdfFile") MultipartFile pdfDatei) throws IOException {
 
-		String pdfFilename = StringUtils.cleanPath(pdfDatei.getOriginalFilename());
-		Pdf_Stellenangebot pdfStellenangebot = new Pdf_Stellenangebot(pdfFilename, pdfDatei.getContentType(), pdfDatei.getBytes());
-		
-		pdf_StellenangebotRepository.save(pdfStellenangebot);
-
-		ResponseEntity<Pdf_Stellenangebot> sa = ResponseEntity.ok(pdfStellenangebot);
-		
-		return sa;		
-	}
 	
-	/*******************/
-	/** DOWNLOAD Pdf  **/
-	/*******************/
-	@GetMapping(path = { "/downloadpdf/{fileName}" })
-	public Pdf_Stellenangebot getPdf(@PathVariable("fileName") String dateiName) throws IOException {
-
-		// neuere optimiere kürzere Version
-		Optional<Pdf_Stellenangebot> retrievedPdf = pdf_StellenangebotRepository.findByName(dateiName);
-		Pdf_Stellenangebot pdf = retrievedPdf.get();
-		
-		/*
-		byte[] bytes_dnld = img.getPicByte();
-		long len = img.getPicByte().length;
-				
-		// andere, umständlichere Version
-	    Pdf_Stellenangebot pdf = new Pdf_Stellenangebot(
-	    		retrievedPdf.get().getName(), 
-	    		retrievedPdf.get().getType(),
-	    		decompressBytes(retrievedPdf.get().getBinData())
-	    	
-	    );
-	    */
-	    
-	    return pdf;
-	}	
-
 	/************************************************************************************************************/
 	/** DOWNLOAD Pdf-Bytes für windows.open ( BinaryDate ) über die Id in der Tabelle "ibm.pdf_stellenangebot" **/
 	/************************************************************************************************************/
@@ -258,6 +237,28 @@ public class IbmRestController {
 	}	
 		
 	
+	/*
+	 * Die folenden Endpoints bzl. Up und Dow ovn pdf-Dateien werden derzeit nicht verwendet
+	 */
+	
+	
+	/**********************/
+	/** POST: UPLOAD Pdf **/
+	/**********************/
+	
+	@PostMapping(path = "/uploadpdf", produces = MediaType.APPLICATION_JSON_VALUE)
+	public  ResponseEntity<Pdf_Stellenangebot> uploadPdf(@RequestParam("pdfFile") MultipartFile pdfDatei) throws IOException {
+
+		String pdfFilename = StringUtils.cleanPath(pdfDatei.getOriginalFilename());
+		Pdf_Stellenangebot pdfStellenangebot = new Pdf_Stellenangebot(pdfFilename, pdfDatei.getContentType(), pdfDatei.getBytes());
+		
+		pdf_StellenangebotRepository.save(pdfStellenangebot);
+
+		ResponseEntity<Pdf_Stellenangebot> sa = ResponseEntity.ok(pdfStellenangebot);
+		
+		return sa;		
+	}
+	
 	/************************************************************************************************************/
 	/** DOWNLOAD Pdf-Bytes für windows.open ( BinaryDate ) über die Id in der Tabelle "ibm.pdf_stellenangebot" **/
 	/************************************************************************************************************/
@@ -284,7 +285,21 @@ public class IbmRestController {
 	    
 	    return bbytes;	   
 	}	
+	
+	
+	/*******************/
+	/** DOWNLOAD Pdf  **/
+	/*******************/
+	@GetMapping(path = { "/downloadpdf/{fileName}" })
+	public Pdf_Stellenangebot getPdf(@PathVariable("fileName") String dateiName) throws IOException {
+
+		// neuere optimiere kürzere Version
+		Optional<Pdf_Stellenangebot> retrievedPdf = pdf_StellenangebotRepository.findByName(dateiName);
+		Pdf_Stellenangebot pdf = retrievedPdf.get();
 		
+	    return pdf;
+	}	
+
 	
 	
 }
