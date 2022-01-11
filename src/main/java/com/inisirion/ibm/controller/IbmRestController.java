@@ -208,6 +208,33 @@ public class IbmRestController {
 		return sa;		
 	}
 
+
+	/************************************************************************************************************/
+	/** DOWNLOAD Pdf-Bytes für windows.open ( BinaryDate ) über die Id in der Tabelle "ibm.pdf_stellenangebot" **/
+	/************************************************************************************************************/
+	@GetMapping(path = { "/dnldpdfbyid/{id}" })
+	public ResponseEntity<byte[]> getBinaryFileByName(@PathVariable("id") Long id) {
+		  
+		// Bsp. für einen Aufruf: http://localhost:8081/binary/file/anzeige.pdf
+			 
+		// Man holt sich hier zunächst ganz normal einen Datensatz aus der DB-Tabelle "ibm.pdf_stellenangebot".
+		
+		// Interessant ist der Rückgabewert "bbytes, der genau so benötigt wird, damit woindows.open() im
+		// Frontend mit diesen Daten etwas anfangen kann, bzw. automatischden Downlaod der Pdf-Datei anstößt
+		
+		Optional<Pdf_Stellenangebot> pdfFile = pdf_StellenangebotRepository.findById(id);
+		Pdf_Stellenangebot fileEntry = pdfFile.get();
+	    
+	    String fname = fileEntry.getName();
+	    byte[] bytes = fileEntry.getBinData(); // Das sind die binären Daten, die das pdf-Dokument enthalten
+
+	    ResponseEntity<byte[]> bbytes =  ResponseEntity
+	    		.ok()
+	            .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fname + "\"")
+	            .body(bytes);
+	    
+	    return bbytes;	   
+	}	
 	
 	/************************************************************************************************************/
 	/** DOWNLOAD Pdf-Bytes für windows.open ( BinaryDate ) über die Id in der Tabelle "ibm.pdf_stellenangebot" **/
@@ -238,7 +265,7 @@ public class IbmRestController {
 		
 	
 	/*
-	 * Die folenden Endpoints bzl. Up und Dow ovn pdf-Dateien werden derzeit nicht verwendet
+	 * Die folgenden Endpoints bzl. Up und Down von pdf-Dateien werden derzeit nicht verwendet
 	 */
 	
 	

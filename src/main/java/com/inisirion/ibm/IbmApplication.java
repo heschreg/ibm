@@ -48,9 +48,18 @@ public class IbmApplication {
 		@Override
 		public void run(String... args) throws Exception {
 
-			////////////////////////////////////////////////
-			// Anlegen von Stammdaten für Status und Kanäle
-			////////////////////////////////////////////////
+			// Anlage von Stammdaten 
+			// this.insert_stammdaten();
+
+			// Anlage von 3 Stellenangeboten 
+			// this.insert_stellenangebote();
+		}
+		
+		/*
+		 * Anlegen von Stammdaten für Status und Kanäle
+		 * 
+		 */
+		private void insert_stammdaten() {
 			
 			sdStatusRepository.save(new SD_Status(444441L, "in Vorbereitung"));
 			sdStatusRepository.save(new SD_Status(444442L, "online"));
@@ -63,10 +72,15 @@ public class IbmApplication {
 			sdKanalRepository.save(new SD_Kanal(555553L, "Xing"));
 			sdKanalRepository.save(new SD_Kanal(555554L, "LinkedIn"));
 					
-
-			////////////////////////////////
-			// Anlage von 3 Stellenangeboten 
-			////////////////////////////////
+			return;
+		}
+		
+		/*
+		 * Anlegen von Stellenangeboten inkl. der Verknüpfungen für die abhängigen Tabellen
+		 * 
+		 */
+		private void insert_stellenangebote() {
+			
 			
 			// *** Stellenangebot 1 *****
 			
@@ -156,7 +170,9 @@ public class IbmApplication {
 			stellenangebotRepository.save(stellenangebot);
 			
 			Stellenangebot sa = stellenangebotRepository.findById(3L).get();
-			
-		}				
+								
+			return;
+		}
+		
 	}
 }
