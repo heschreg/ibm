@@ -27,7 +27,8 @@ public class StellenangebotDateDeserializer extends JsonDeserializer<Date> {
 		// In der Datenbank sind die korrespondierenden Felder vom Typ "DATETIME"
 		
 		try {
-			date = format.parse(p.getText());
+			String s = p.getText();
+			date = format.parse(s);
 		} catch (ParseException e) {
 			e.printStackTrace();
 		}
