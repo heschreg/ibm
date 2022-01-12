@@ -1,6 +1,7 @@
 package com.inisirion.ibm.controller;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -93,7 +94,36 @@ public class IbmRestController {
 		return ResponseEntity.ok(stellenangebot);
 	}
 	
-	// Inserten eines neuen Datensatzes
+	// UPDATE eines Stellenangebotes
+	@PutMapping(path= "/stellenangebot/{id}", consumes = "application/json", produces = "application/json")
+	public ResponseEntity<Stellenangebot> updateStellenangebot(@PathVariable Long id, @RequestBody Stellenangebot stellenangebotDetails){
+		
+		Optional<Stellenangebot> stellenangebot_opt = stellenangebotRepository.findById(id);
+		Stellenangebot stellenangebot = stellenangebot_opt.get();
+		
+		Date begDate = stellenangebotDetails.getBeginn();
+		// stellenangebot.setBeginn(stellenangebotDetails.getBeginn());
+		
+		stellenangebot.setBezeichnung(stellenangebotDetails.getBezeichnung());
+		
+		Date endDate = stellenangebotDetails.getEnde();
+		// stellenangebot.setEnde(stellenangebotDetails.getEnde());
+		
+		stellenangebot.setKanaele(stellenangebotDetails.getKanaele());
+		stellenangebot.setNotizen(stellenangebotDetails.getNotizen());
+		stellenangebot.setSd_kanal(stellenangebotDetails.getSd_kanal());
+		stellenangebot.setSd_status(stellenangebotDetails.getSd_status());
+
+		Pdf_Stellenangebot pdf_Stellenangebot = stellenangebotDetails.getPdf_stellenangebot();
+		// stellenangebot.setPdf_stellenangebot(pdf_Stellenangebot);
+		
+		Stellenangebot updatedStellenangebot = stellenangebotRepository.save(stellenangebot);		
+		ResponseEntity<Stellenangebot> sa = ResponseEntity.ok(updatedStellenangebot);		
+		return sa;
+	}
+	
+	
+	// INSERT eines neuen Datensatzes
 	@PostMapping(path= "/stellenangebot", consumes = "application/json", produces = "application/json")
 	public ResponseEntity<Stellenangebot> createStellenangebot(@RequestBody Stellenangebot stellenangebotDetails) {
 
@@ -124,63 +154,24 @@ public class IbmRestController {
 		return sa;
 	}
 
-	@PostMapping(path= "/stellenangebot/{id}", consumes = "application/json", produces = "application/json")
-	public ResponseEntity<Stellenangebot> postStellenangebot(@PathVariable Long id, @RequestBody Stellenangebot stellenangebotDetails){
-		
-		// Holen des Stellenangebotes, in dem etwas upzudaten ist
-		Optional<Stellenangebot> stellenangebot_opt = stellenangebotRepository.findById(id);
-		 	// .orElseThrow(() -> new ResourceNotFoundException("Employee not exist with id :" + id));		
-		Stellenangebot stellenangebot = stellenangebot_opt.get();
-		
-		///////////////////////////////////////////////////////
-		// Updaten der Properties im bestehenden Datensatz
-		///////////////////////////////////////////////////////
-		
-		// stellenangebot.setBeginn(stellenangebotDetails.getBeginn());
-		stellenangebot.setBezeichnung(stellenangebotDetails.getBezeichnung());
-		// stellenangebot.setEnde(stellenangebotDetails.getEnde());
-		
-		stellenangebot.setKanaele(stellenangebotDetails.getKanaele());
-		stellenangebot.setNotizen(stellenangebotDetails.getNotizen());
-		stellenangebot.setSd_kanal(stellenangebotDetails.getSd_kanal());
-		stellenangebot.setSd_status(stellenangebotDetails.getSd_status());
-				
-		Stellenangebot updatedStellenangebot = stellenangebotRepository.save(stellenangebot);		
-		ResponseEntity<Stellenangebot> sa = ResponseEntity.ok(updatedStellenangebot);		
-		return sa;
-	}
-	
-	
-	@PutMapping("/stellenangebot/{id}")
-	public ResponseEntity<Stellenangebot> updateStellenangebot(@PathVariable Long id, @RequestBody Stellenangebot stellenangebotDetails){
-		
-		Optional<Stellenangebot> stellenangebot_opt = stellenangebotRepository.findById(id);
-		 	// .orElseThrow(() -> new ResourceNotFoundException("Employee not exist with id :" + id));
-		
-		Stellenangebot stellenangebot = stellenangebot_opt.get();
-		
-		// stellenangebot.setBeginn(stellenangebotDetails.getBeginn());
-		stellenangebot.setBezeichnung(stellenangebotDetails.getBezeichnung());
-		// stellenangebot.setEnde(stellenangebotDetails.getEnde());
-		
-		stellenangebot.setKanaele(stellenangebotDetails.getKanaele());
-		stellenangebot.setNotizen(stellenangebotDetails.getNotizen());
-		stellenangebot.setSd_kanal(stellenangebotDetails.getSd_kanal());
-		stellenangebot.setSd_status(stellenangebotDetails.getSd_status());
-				
-		Stellenangebot updatedStellenangebot = stellenangebotRepository.save(stellenangebot);		
-		ResponseEntity<Stellenangebot> sa = ResponseEntity.ok(updatedStellenangebot);		
-		return sa;
-	}
-	
-
 	// =======================================================================
 
-	/******************************************************************************
+	/***************************************************************************************
+	 * 
 	 * POST: UPLOAD Pdf mit Verknüpfung zur zentralen Entität  "stellenangebot" 
-	 * Parameter 1: id des betroffenen Stellenangebots 
-	 * Parameter 2: Name der upzuloadenden pdf-Datei 
-	******************************************************************************/
+	 * Parameter 1: Id des betroffenen Stellenangebots 
+	 * Parameter 2: Multifile-Parameter bgzl. der upzuloadenden pdf-Datei 
+	 * 
+	 * Aufruf im Frontend:
+	 * ===================
+	 * 
+	 * const uploadData = new FormData();
+     * uploadData.append('pdfFile', pdfFile, pdfFile.name);
+     * 
+	 * @PostMapping(path = "/uploadpdfsa/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+     * return this.httpClient.post(`localhost:8080/ibm/uploadpdfsa/${id}`, uploadData);
+     * 
+	 *****************************************************************************************/
 	
 	@PostMapping(path = "/uploadpdfsa/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
 	public  ResponseEntity<Stellenangebot> uploadPdfSa(@PathVariable Long id, @RequestParam("pdfFile") MultipartFile pdfDatei) throws IOException {

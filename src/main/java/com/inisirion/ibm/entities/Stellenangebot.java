@@ -1,13 +1,13 @@
 package com.inisirion.ibm.entities;
 
 import java.io.Serializable;
+
+import com.inisirion.ibm.serializer.StellenangebotDateSerializer;
+
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -21,6 +21,8 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
 @Entity
 @Table(name = "Stellenangebot")
 public class Stellenangebot {
@@ -33,9 +35,11 @@ public class Stellenangebot {
 	private String bezeichnung;
 
 	@Column(name = "beginn")
+    @JsonSerialize(using = StellenangebotDateSerializer.class)    	
 	private Date beginn;
 
 	@Column(name = "ende")
+	@JsonSerialize(using = StellenangebotDateSerializer.class)    	
 	private Date ende;
 		
 	@Column(name = "notizen")
