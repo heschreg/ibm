@@ -28,7 +28,12 @@ public class StellenangebotDateDeserializer extends JsonDeserializer<Date> {
 		
 		try {
 			String s = p.getText();
-			date = format.parse(s);
+			if (s == null || s.length() < 10) {
+				date = null;
+			} else {
+				date = format.parse(s);				
+			}
+			
 		} catch (ParseException e) {
 			e.printStackTrace();
 		}

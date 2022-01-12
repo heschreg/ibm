@@ -102,12 +102,12 @@ public class IbmRestController {
 		Stellenangebot stellenangebot = stellenangebot_opt.get();
 		
 		Date begDate = stellenangebotDetails.getBeginn();
-		// stellenangebot.setBeginn(stellenangebotDetails.getBeginn());
+		stellenangebot.setBeginn(begDate);
 		
 		stellenangebot.setBezeichnung(stellenangebotDetails.getBezeichnung());
 		
 		Date endDate = stellenangebotDetails.getEnde();
-		// stellenangebot.setEnde(stellenangebotDetails.getEnde());
+		stellenangebot.setEnde(endDate);
 		
 		stellenangebot.setKanaele(stellenangebotDetails.getKanaele());
 		stellenangebot.setNotizen(stellenangebotDetails.getNotizen());

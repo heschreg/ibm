@@ -31,6 +31,10 @@ public class SD_Kanal {
 	
 	public SD_Kanal() {}
 
+	public SD_Kanal(String bezeichnung) {
+		this.bezeichnung = bezeichnung;
+	}
+	
 	public SD_Kanal(long id, String bezeichnung) {
 		super();
 		this.bezeichnung = bezeichnung;

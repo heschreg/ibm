@@ -59,7 +59,7 @@ public class IbmApplication {
 		public void run(String... args) throws Exception {
 
 			// Anlage von Stammdaten 
-			// this.insert_stammdaten();
+			this.insert_stammdaten();
 
 			// Anlage von 3 Stellenangeboten 
 			// this.insert_stellenangebote();
@@ -130,6 +130,7 @@ public class IbmApplication {
 		 */
 		private void insert_stammdaten() {
 			
+			/*
 			sdStatusRepository.save(new SD_Status(444441L, "in Vorbereitung"));
 			sdStatusRepository.save(new SD_Status(444442L, "online"));
 			sdStatusRepository.save(new SD_Status(444443L, "eingestellt"));
@@ -140,6 +141,8 @@ public class IbmApplication {
 			sdKanalRepository.save(new SD_Kanal(555552L, "Jobbörse"));
 			sdKanalRepository.save(new SD_Kanal(555553L, "Xing"));
 			sdKanalRepository.save(new SD_Kanal(555554L, "LinkedIn"));
+			*/
+			sdKanalRepository.save(new SD_Kanal(555551L, "unklar"));
 					
 			return;
 		}
