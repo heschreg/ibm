@@ -141,8 +141,8 @@ public class IbmApplication {
 			sdKanalRepository.save(new SD_Kanal(555552L, "Jobbörse"));
 			sdKanalRepository.save(new SD_Kanal(555553L, "Xing"));
 			sdKanalRepository.save(new SD_Kanal(555554L, "LinkedIn"));
-			*/
 			sdKanalRepository.save(new SD_Kanal(555551L, "unklar"));
+			*/
 					
 			return;
 		}

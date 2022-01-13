@@ -134,9 +134,13 @@ public class IbmRestController {
 		// Setzen der Properties im neu anzulegenden Datensatz
 		///////////////////////////////////////////////////////
 		
-		// stellenangebot.setBeginn(stellenangebotDetails.getBeginn());
+		Date begDate = stellenangebotDetails.getBeginn();
+		stellenangebot.setBeginn(begDate);
+		
 		stellenangebot.setBezeichnung(stellenangebotDetails.getBezeichnung());
-		// stellenangebot.setEnde(stellenangebotDetails.getEnde());
+		
+		Date endDate = stellenangebotDetails.getEnde();
+		stellenangebot.setEnde(endDate);
 		
 		stellenangebot.setKanaele(stellenangebotDetails.getKanaele());
 		stellenangebot.setNotizen(stellenangebotDetails.getNotizen());
