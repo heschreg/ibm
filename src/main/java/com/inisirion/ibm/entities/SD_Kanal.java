@@ -28,6 +28,8 @@ public class SD_Kanal {
 	// 1 Stellenangebot kann viele Kanäle verwenden
 	@ManyToMany(mappedBy = "kanaele",fetch = FetchType.LAZY)
 	private List <Stellenangebot>  stellenangebote = new ArrayList <>();
+
+	// === Constructors =====================
 	
 	public SD_Kanal() {}
 
@@ -40,6 +42,8 @@ public class SD_Kanal {
 		this.bezeichnung = bezeichnung;
 	}
 
+	// === Getter/Setter =====================
+	
 	public long getId() {
 		return id;
 	}

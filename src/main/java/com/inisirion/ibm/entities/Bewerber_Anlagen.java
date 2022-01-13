@@ -1,7 +1,5 @@
 package com.inisirion.ibm.entities;
 
-import java.util.Arrays;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -9,17 +7,18 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
-import org.hibernate.annotations.GenericGenerator;
-
 @Entity
-@Table(name = "pdf_stellenangebot")
-public class Pdf_Stellenangebot {
+@Table(name = "bewerber_anlagen")
+public class Bewerber_Anlagen {
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-    private  long id;
-
-    @Column(name = "name")
+	private long id;
+	
+	@Column(name = "id_bewerber", nullable=false)
+	private long id_bewerber;
+	
+	@Column(name = "name")
     private String name;
 
     @Column(name = "type")
@@ -29,26 +28,24 @@ public class Pdf_Stellenangebot {
     // which is more than the default length for binData column
     @Column(name = "binData", length = 10000000)
     private byte[] binData;
-    
-	// === Constructors =====================
 
-	public Pdf_Stellenangebot() {
+    
+    // === Constructors =====================
+    
+	public Bewerber_Anlagen() {
 		super();
 	}
 
-	public Pdf_Stellenangebot(String name, String type, byte[] binData) {
+	public Bewerber_Anlagen(long id_bewerber, String name, String type, byte[] binData) {
 		super();
+		this.id_bewerber = id_bewerber;
 		this.name = name;
 		this.type = type;
 		this.binData = binData;
 	}
-	
-	// === Getter/Setter =====================
-	
-	public String getName() {
-		return name;
-	}
 
+	// === Getter/Setter =====================
+		
 	public long getId() {
 		return id;
 	}
@@ -57,11 +54,22 @@ public class Pdf_Stellenangebot {
 		this.id = id;
 	}
 
+	public long getId_bewerber() {
+		return id_bewerber;
+	}
+
+	public void setId_bewerber(long id_bewerber) {
+		this.id_bewerber = id_bewerber;
+	}
+
+	public String getName() {
+		return name;
+	}
+
 	public void setName(String name) {
 		this.name = name;
 	}
 
-	
 	public String getType() {
 		return type;
 	}
@@ -70,7 +78,6 @@ public class Pdf_Stellenangebot {
 		this.type = type;
 	}
 
-	
 	public byte[] getBinData() {
 		return binData;
 	}
@@ -78,13 +85,5 @@ public class Pdf_Stellenangebot {
 	public void setBinData(byte[] binData) {
 		this.binData = binData;
 	}
-
 	
-	@Override
-	public String toString() {
-		return "Pdf_Stellenangebot [id=" + id + ", name=" + name + ", type=" + type + ", binData="
-				+ Arrays.toString(binData) + "]";
-	}
-
-   
 }

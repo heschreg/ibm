@@ -76,12 +76,11 @@ public class Stellenangebot {
 	@JoinColumn (name = "pdf_stellenangebot_id", nullable = false)
 	private Pdf_Stellenangebot pdf_stellenangebot;
 	
-
-	// === Constructors: =====================
-	
-	
+	// === Constructors =====================
+		
 	public Stellenangebot() {}	
-	
+
+	// === Getter/Setter: =====================
 	
 	public long getId() {
 		return id;

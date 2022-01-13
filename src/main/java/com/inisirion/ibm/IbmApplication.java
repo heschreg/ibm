@@ -22,10 +22,12 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.inisirion.ibm.entities.Pdf_Stellenangebot;
 import com.inisirion.ibm.entities.SD_Kanal;
+import com.inisirion.ibm.entities.SD_Kommunikation;
 import com.inisirion.ibm.entities.SD_Status;
 import com.inisirion.ibm.entities.Stellenangebot;
 import com.inisirion.ibm.repository.Pdf_StellenangebotRepository;
 import com.inisirion.ibm.repository.SD_KanalRepository;
+import com.inisirion.ibm.repository.SD_KommunikationRepository;
 import com.inisirion.ibm.repository.SD_StatusRepository;
 import com.inisirion.ibm.repository.StellenangebotRepository;
 import com.inisirion.ibm.serializer.CustomHttpMessageConverter;
@@ -53,6 +55,9 @@ public class IbmApplication {
 
 		@Autowired 
 		private Pdf_StellenangebotRepository pdf_stellenangebotRepository;	
+		
+		@Autowired 
+		SD_KommunikationRepository sdKommunikationRepository;
 		
 		
 		@Override
@@ -129,6 +134,17 @@ public class IbmApplication {
 		 * 
 		 */
 		private void insert_stammdaten() {
+			
+			sdKommunikationRepository.save(new SD_Kommunikation("Eingang"));
+			sdKommunikationRepository.save(new SD_Kommunikation("Rückfrage"));
+			sdKommunikationRepository.save(new SD_Kommunikation("EinladungInterview"));
+			sdKommunikationRepository.save(new SD_Kommunikation("Interview"));
+			sdKommunikationRepository.save(new SD_Kommunikation("EinladungVorstellung"));
+			sdKommunikationRepository.save(new SD_Kommunikation("Vorstellung"));
+			sdKommunikationRepository.save(new SD_Kommunikation("Eingang"));
+			sdKommunikationRepository.save(new SD_Kommunikation("Nachfrage"));
+			sdKommunikationRepository.save(new SD_Kommunikation("Zweitinterview"));
+			sdKommunikationRepository.save(new SD_Kommunikation("Einstellung"));			
 			
 			/*
 			sdStatusRepository.save(new SD_Status(444441L, "in Vorbereitung"));
