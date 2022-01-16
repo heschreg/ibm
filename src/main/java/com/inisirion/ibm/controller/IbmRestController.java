@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.inisirion.ibm.entities.Bewerber;
+import com.inisirion.ibm.entities.Kommunikation;
 import com.inisirion.ibm.entities.Pdf_Stellenangebot;
 import com.inisirion.ibm.entities.SD_Kanal;
 import com.inisirion.ibm.entities.SD_Status;
@@ -95,6 +96,43 @@ public class IbmRestController {
 		return bew;
 	}
 
+
+	// UPDATE eines Bewerber-Datensatzes
+	@PutMapping(path= "/bewerber/{id}", consumes = "application/json", produces = "application/json")
+	public ResponseEntity<Bewerber> updateBewerber(@PathVariable Long id, @RequestBody Bewerber bewerberDetails){
+		
+		Optional<Bewerber> bewerber_opt = bewerberRepository.findById(id);
+		Bewerber bewerber = bewerber_opt.get();
+		
+		bewerber.setIdstellenangebot(bewerberDetails.getIdstellenangebot());
+		bewerber.setNachname(bewerberDetails.getNachname());
+		bewerber.setVorname(bewerberDetails.getVorname());
+		bewerber.setAnrede(bewerberDetails.getAnrede());
+		bewerber.setTitel(bewerberDetails.getTitel());
+		bewerber.setPlz(bewerberDetails.getPlz());
+		bewerber.setOrt(bewerberDetails.getOrt());
+		bewerber.setStrasse(bewerberDetails.getStrasse());
+		bewerber.setHausnummer(bewerberDetails.getHausnummer());
+		bewerber.setEmail(bewerberDetails.getEmail());
+		bewerber.setNotizen(bewerberDetails.getNotizen());
+		bewerber.setSkills(bewerberDetails.getSkills());
+		
+		List<Kommunikation> listKommunikation = bewerber.getKommunikationen();
+		listKommunikation.clear();
+		
+		List<Kommunikation> listKommunikationChanged = bewerberDetails.getKommunikationen();
+		
+		listKommunikationChanged.forEach(listEntry -> {
+			listKommunikation.add(listEntry);
+		});
+				
+		bewerber.setKommunikationen(listKommunikation);
+						
+		Bewerber updatedBewerber = bewerberRepository.save(bewerber);		
+		ResponseEntity<Bewerber> bew = ResponseEntity.ok(updatedBewerber);		
+		return bew;
+	}
+	
 	
 	
 
