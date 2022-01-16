@@ -21,10 +21,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.inisirion.ibm.entities.Bewerber;
 import com.inisirion.ibm.entities.Pdf_Stellenangebot;
 import com.inisirion.ibm.entities.SD_Kanal;
 import com.inisirion.ibm.entities.SD_Status;
 import com.inisirion.ibm.entities.Stellenangebot;
+import com.inisirion.ibm.repository.BewerberRepository;
 import com.inisirion.ibm.repository.Pdf_StellenangebotRepository;
 import com.inisirion.ibm.repository.SD_KanalRepository;
 import com.inisirion.ibm.repository.SD_StatusRepository;
@@ -34,9 +36,15 @@ import com.inisirion.ibm.repository.StellenangebotRepository;
 @RestController
 @RequestMapping("/ibm")
 public class IbmRestController {
+
+	@Autowired
+	private  BewerberRepository bewerberRepository;
 	
 	@Autowired
 	private  StellenangebotRepository stellenangebotRepository;
+
+	@Autowired
+	private  Pdf_StellenangebotRepository pdf_StellenangebotRepository;
 
 	@Autowired
 	private  SD_StatusRepository sd_StatusRepository;
@@ -44,35 +52,65 @@ public class IbmRestController {
 	@Autowired
 	private  SD_KanalRepository sd_KanalRepository;
 	
-	@Autowired
-	private  Pdf_StellenangebotRepository pdf_StellenangebotRepository;
 	
-	// =======================================================
+	// ===  Bewerber ====================================================
 
-	// Holen aller Stammdaten für Status 
-	@GetMapping("/sd_status")
-	@CrossOrigin(origins = "http://localhost:4200")
-	public List<SD_Status> getAllStatus(){
-		List<SD_Status> list_status = sd_StatusRepository.findAll();		
-		return list_status;
+	// Bewerber zu einem Stellenangebot
+	@GetMapping("/bewerber/{id}")
+	public List<Bewerber> getBewerberByIdStellenangebot(@PathVariable long id) {
+		
+		// List<Bewerber> list_bewerber = bewerberRepository.findByidstellenangebotOrderByNachname(id);
+		List<Bewerber> list_bewerber = bewerberRepository.findByidstellenangebotOrderById(id);
+		return list_bewerber;
 	}
 
-	// Holen aller Stammdaten für Kanäle 
-	@GetMapping("/sd_kanaele")
-	@CrossOrigin(origins = "http://localhost:4200")
-	public List<SD_Kanal> getAllKanaele(){
-		List<SD_Kanal> list_kanaele = sd_KanalRepository.findAll();	
-		return list_kanaele;
-	}		
+	// INSERT eines neuen Datensatzes
+	@PostMapping(path= "/bewerber", consumes = "application/json", produces = "application/json")
+	public ResponseEntity<Bewerber> createBewerber(@RequestBody Bewerber bewerberDetails) {
+
+		// Instantiieren eines neuen Datensatzes
+		Bewerber bewerber = new Bewerber();
+
+		///////////////////////////////////////////////////////
+		// Setzen der Properties im neu anzulegenden Datensatz
+		///////////////////////////////////////////////////////
+		bewerber.setIdstellenangebot(bewerberDetails.getIdstellenangebot());
+		bewerber.setNachname(bewerberDetails.getNachname());
+		bewerber.setVorname(bewerberDetails.getVorname());
+		bewerber.setAnrede(bewerberDetails.getAnrede());
+		bewerber.setTitel(bewerberDetails.getTitel());
+		bewerber.setPlz(bewerberDetails.getPlz());
+		bewerber.setOrt(bewerberDetails.getOrt());
+		bewerber.setStrasse(bewerberDetails.getStrasse());
+		bewerber.setHausnummer(bewerberDetails.getHausnummer());
+		bewerber.setEmail(bewerberDetails.getEmail());
+		bewerber.setNotizen(bewerberDetails.getNotizen());
+		bewerber.setSkills(bewerberDetails.getSkills());
+		bewerber.setKommunikationen(bewerberDetails.getKommunikationen());
+				
+		Bewerber newBewerber = bewerberRepository.save(bewerber);
+		
+		ResponseEntity<Bewerber> bew = ResponseEntity.ok(newBewerber);
+		
+		return bew;
+	}
+
 	
-	// get alle Stellenangebote
+	
+
+	
+	
+	// ===  Stellenangebote ====================================================
+	
+	// alle Stellenangebote
 	@GetMapping("/stellenangebot")
 	public List<Stellenangebot> getAllStellenangebote(){		
 		List<Stellenangebot> list_stellenangebote = stellenangebotRepository.findAll();		
 		return list_stellenangebote;
-	}		
+	}			
+	
 
-	// get employee by id rest api
+	// Stellenangebot by id
 	@GetMapping("/stellenangebot/{id}")
 	public ResponseEntity<Stellenangebot> getStellenangebotById(@PathVariable Long id) {
 		
@@ -257,11 +295,29 @@ public class IbmRestController {
 	    
 	    return bbytes;	   
 	}	
-		
+
+	// ===  Stammdaten ====================================================
+
+	// Holen aller Stammdaten für Status 
+	@GetMapping("/sd_status")
+	@CrossOrigin(origins = "http://localhost:4200")
+	public List<SD_Status> getAllStatus(){
+		List<SD_Status> list_status = sd_StatusRepository.findAll();		
+		return list_status;
+	}
+
+	// Holen aller Stammdaten für Kanäle 
+	@GetMapping("/sd_kanaele")
+	@CrossOrigin(origins = "http://localhost:4200")
+	public List<SD_Kanal> getAllKanaele(){
+		List<SD_Kanal> list_kanaele = sd_KanalRepository.findAll();	
+		return list_kanaele;
+	}		
 	
-	/*
+	
+	/********************************************************************************************
 	 * Die folgenden Endpoints bzl. Up und Down von pdf-Dateien werden derzeit nicht verwendet
-	 */
+	 ********************************************************************************************/
 	
 	
 	/**********************/

@@ -20,9 +20,9 @@ public class Bewerber {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long id;
 	
-	@Column(name = "id_stellenangebot")
-	private long id_stellenangebot;
-	
+	@Column(name = "idstellenangebot")
+	private long idstellenangebot;
+		
 	@Column(name = "nachname")
 	private String nachname;
 
@@ -38,6 +38,9 @@ public class Bewerber {
 	@Column(name = "plz")
 	private int plz;
 
+	@Column(name = "ort")
+	private String ort;
+	
 	@Column(name = "strasse")
 	private String strasse;
 
@@ -65,10 +68,22 @@ public class Bewerber {
 
 	// === Getter/Setter: =====================
 
+	
 	public void addKommunikation(Kommunikation kommunikation) {
 		kommunikationen.add(kommunikation);
 		kommunikation.setBewerber(this);
 	}
+
+
+	public long getIdstellenangebot() {
+		return idstellenangebot;
+	}
+
+
+	public void setIdstellenangebot(long idstellenangebot) {
+		this.idstellenangebot = idstellenangebot;
+	}
+
 
 	public long getId() {
 		return id;
@@ -78,12 +93,13 @@ public class Bewerber {
 		this.id = id;
 	}
 
-	public long getId_stellenangebot() {
-		return id_stellenangebot;
+
+	public String getOrt() {
+		return ort;
 	}
 
-	public void setId_stellenangebot(long id_stellenangebot) {
-		this.id_stellenangebot = id_stellenangebot;
+	public void setOrt(String ort) {
+		this.ort = ort;
 	}
 
 	public String getNachname() {

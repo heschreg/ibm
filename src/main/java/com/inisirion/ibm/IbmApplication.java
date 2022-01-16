@@ -67,7 +67,7 @@ public class IbmApplication {
 			this.insert_stammdaten();
 
 			// Anlage von 3 Stellenangeboten 
-			// this.insert_stellenangebote();
+			this.insert_stellenangebote();
 			
 			// funkionierendes Bsp, um ein Objekt mit einer Property vom Typ "Date" zu serialisieren ===> {"startdateemployee": "21.04.2021"}
 			// this.exampleJsonSerializer();
@@ -146,7 +146,6 @@ public class IbmApplication {
 			sdKommunikationRepository.save(new SD_Kommunikation("Zweitinterview"));
 			sdKommunikationRepository.save(new SD_Kommunikation("Einstellung"));			
 			
-			/*
 			sdStatusRepository.save(new SD_Status(444441L, "in Vorbereitung"));
 			sdStatusRepository.save(new SD_Status(444442L, "online"));
 			sdStatusRepository.save(new SD_Status(444443L, "eingestellt"));
@@ -158,7 +157,6 @@ public class IbmApplication {
 			sdKanalRepository.save(new SD_Kanal(555553L, "Xing"));
 			sdKanalRepository.save(new SD_Kanal(555554L, "LinkedIn"));
 			sdKanalRepository.save(new SD_Kanal(555551L, "unklar"));
-			*/
 					
 			return;
 		}
