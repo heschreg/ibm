@@ -13,6 +13,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.inisirion.ibm.serializer.IbmDateDeserializer;
@@ -22,6 +23,7 @@ import com.inisirion.ibm.serializer.StellenangebotDateSerializer;
 
 @Entity
 @Table(name = "kommunikation")
+@JsonIgnoreProperties(value={"bewerber"})  
 public class Kommunikation {
 	
 	@Id
@@ -88,8 +90,5 @@ public class Kommunikation {
 	public void setSd_kommunikation(SD_Kommunikation sd_kommunikation) {
 		this.sd_kommunikation = sd_kommunikation;
 	}	
-
 	
-	
-	
-	}
+}

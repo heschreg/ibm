@@ -29,6 +29,7 @@ import com.inisirion.ibm.entities.SD_Kommunikation;
 import com.inisirion.ibm.entities.SD_Status;
 import com.inisirion.ibm.entities.Stellenangebot;
 import com.inisirion.ibm.repository.BewerberRepository;
+import com.inisirion.ibm.repository.KommunikationRepository;
 import com.inisirion.ibm.repository.Pdf_StellenangebotRepository;
 import com.inisirion.ibm.repository.SD_KanalRepository;
 import com.inisirion.ibm.repository.SD_KommunikationRepository;
@@ -57,6 +58,21 @@ public class IbmRestController {
 	
 	@Autowired
 	private  SD_KommunikationRepository sd_KommunikationRepository;
+
+	@Autowired
+	private  KommunikationRepository kommunikationRepository;
+	
+	// ===  Kommunikation  ====================================================
+	
+	@GetMapping("/kommunikation/{id_bewerber}")
+	public List<Kommunikation> getKommunikationByIdBewerber(@PathVariable long id_bewerber) {
+		
+		List<Kommunikation> list_komunikation = kommunikationRepository.findBybewerberId(id_bewerber);
+		
+		return list_komunikation;
+	}
+
+
 	
 	// ===  Bewerber ====================================================
 
@@ -68,17 +84,18 @@ public class IbmRestController {
 		List<Bewerber> list_bewerber = bewerberRepository.findByidstellenangebotOrderById(id);
 		
 		List<Kommunikation> kommunikationen = list_bewerber.get(0).getKommunikationen();
-
-		
+		// Aufgrund JsonIgnoreProperty bzgl. Kommunikation in der Entität "bewerber" wird
+        // die Kommunkationshistorie nicht deserialisiert		
 		/*
 		long idstellenangebot = list_bewerber.get(0).getIdstellenangebot();
 		
 		
-		String anmerkungen = kommunikationen.get(0).getAnmerkungen(); // Achtung: ist immer nur eine Anmerkung
-		Bewerber bewerber = kommunikationen.get(0).getBewerber();
-		long id_kommunikation = kommunikationen.get(0).getId();
-		SD_Kommunikation sd_Kommunikation = kommunikationen.get(0).getSd_kommunikation();
-		Date zeitpunkt = kommunikationen.get(0).getZeitpunkt();
+		String anmerkungen                
+		= kommunikationen.get(0).getAnmerkungen(); // Achtung: ist immer nur eine Anmerkung
+		Bewerber bewerber                 = kommunikationen.get(0).getBewerber();
+		long id_kommunikation             = kommunikationen.get(0).getId();
+		SD_Kommunikation sd_kommunikation = kommunikationen.get(0).getSd_kommunikation();
+		Date zeitpunkt                    = kommunikationen.get(0).getZeitpunkt();
 		*/
 				
 		return list_bewerber;
@@ -136,26 +153,31 @@ public class IbmRestController {
 		bewerber.setNotizen(bewerberDetails.getNotizen());
 		bewerber.setSkills(bewerberDetails.getSkills());
 		
+		// Löschen der bisherigen Komminkation
 		List<Kommunikation> listKommunikation = bewerber.getKommunikationen();
 		listKommunikation.clear();
-		
-		List<Kommunikation> listKommunikationChanged = bewerberDetails.getKommunikationen();
-		
-		Kommunikation komm = new Kommunikation();
-		komm.setAnmerkungen("Anmerkung wird wohl lüberschrieben?");
-		komm.setBewerber(bewerberDetails);
-		
-		SD_Kommunikation sd_kommunikation = sd_KommunikationRepository.findById(1L).get();
-		komm.setSd_kommunikation(sd_kommunikation);
-		komm.setZeitpunkt(new Date());
-		listKommunikation.add(komm);
-		
+				
 		/*
 		listKommunikationChanged.forEach(listEntry -> {
 			listKommunikation.add(listEntry);
 		});
 		*/
-				
+		
+		// Anlage einer neuen Kommunikation
+		Kommunikation komm = new Kommunikation();
+		komm.setSd_kommunikation(sd_KommunikationRepository.findById(1L).get());		
+		komm.setAnmerkungen("Eingang wurde bestätigt?");
+		komm.setBewerber(bewerberDetails);		
+		komm.setZeitpunkt(new Date());
+		listKommunikation.add(komm);
+
+		komm = new Kommunikation();
+		komm.setSd_kommunikation(sd_KommunikationRepository.findById(2L).get());		
+		komm.setAnmerkungen("Rückfrage muss noch geklärt werden?");
+		komm.setBewerber(bewerberDetails);		
+		komm.setZeitpunkt(new Date());
+		listKommunikation.add(komm);
+						
 		bewerber.setKommunikationen(listKommunikation);
 						
 		Bewerber updatedBewerber = bewerberRepository.save(bewerber);		
