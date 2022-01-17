@@ -141,7 +141,6 @@ public class IbmApplication {
 			sdKommunikationRepository.save(new SD_Kommunikation("Interview"));
 			sdKommunikationRepository.save(new SD_Kommunikation("EinladungVorstellung"));
 			sdKommunikationRepository.save(new SD_Kommunikation("Vorstellung"));
-			sdKommunikationRepository.save(new SD_Kommunikation("Eingang"));
 			sdKommunikationRepository.save(new SD_Kommunikation("Nachfrage"));
 			sdKommunikationRepository.save(new SD_Kommunikation("Zweitinterview"));
 			sdKommunikationRepository.save(new SD_Kommunikation("Einstellung"));			

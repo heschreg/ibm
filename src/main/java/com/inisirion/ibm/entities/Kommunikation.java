@@ -15,6 +15,8 @@ import javax.persistence.Table;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.inisirion.ibm.serializer.IbmDateDeserializer;
+import com.inisirion.ibm.serializer.IbmDateSerializer;
 import com.inisirion.ibm.serializer.StellenangebotDateDeserializer;
 import com.inisirion.ibm.serializer.StellenangebotDateSerializer;
 
@@ -27,8 +29,8 @@ public class Kommunikation {
 	private long id;
 	
 	@Column(name = "zeitpunkt")
-    @JsonSerialize(using = StellenangebotDateSerializer.class)    	
-    @JsonDeserialize(using = StellenangebotDateDeserializer.class)    	
+    @JsonSerialize(using = IbmDateSerializer.class)    	
+    @JsonDeserialize(using = IbmDateDeserializer.class)    	
 	private Date zeitpunkt;
 	
 	@Column(name = "anmerkungen")
@@ -77,8 +79,17 @@ public class Kommunikation {
 
 	public void setBewerber(Bewerber bewerber) {
 		this.bewerber = bewerber;
+	}
+
+	public SD_Kommunikation getSd_kommunikation() {
+		return sd_kommunikation;
+	}
+
+	public void setSd_kommunikation(SD_Kommunikation sd_kommunikation) {
+		this.sd_kommunikation = sd_kommunikation;
 	}	
 
+	
 	
 	
 	}

@@ -2,8 +2,8 @@ package com.inisirion.ibm.entities;
 
 import java.io.Serializable;
 
-import com.inisirion.ibm.serializer.StellenangebotDateSerializer;
-import com.inisirion.ibm.serializer.StellenangebotDateDeserializer;
+import com.inisirion.ibm.serializer.IbmDateSerializer;
+import com.inisirion.ibm.serializer.IbmDateDeserializer;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -37,13 +37,13 @@ public class Stellenangebot {
 	private String bezeichnung;
 
 	@Column(name = "beginn")
-    @JsonSerialize(using = StellenangebotDateSerializer.class)    	
-    @JsonDeserialize(using = StellenangebotDateDeserializer.class)    	
+    @JsonSerialize(using = IbmDateSerializer.class)    	
+    @JsonDeserialize(using = IbmDateDeserializer.class)    	
 	private Date beginn;
 
 	@Column(name = "ende")
-	@JsonSerialize(using = StellenangebotDateSerializer.class)    	
-    @JsonDeserialize(using = StellenangebotDateDeserializer.class)    	
+	@JsonSerialize(using = IbmDateSerializer.class)    	
+    @JsonDeserialize(using = IbmDateDeserializer.class)    	
 	private Date ende;
 		
 	@Column(name = "notizen")

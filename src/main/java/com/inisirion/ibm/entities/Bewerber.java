@@ -1,5 +1,6 @@
 package com.inisirion.ibm.entities;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,9 +13,13 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 @Entity
 @Table(name = "bewerber")
-public class Bewerber {
+@JsonIgnoreProperties(value={"kommunikationen"})  
+public class Bewerber implements Serializable {
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -64,8 +69,12 @@ public class Bewerber {
 		)
 	private List<Kommunikation> kommunikationen = new ArrayList<>();	
 
+	
 	// === Constructors =====================
 
+	public Bewerber() {	}
+
+	
 	// === Getter/Setter: =====================
 
 	
@@ -73,6 +82,7 @@ public class Bewerber {
 		kommunikationen.add(kommunikation);
 		kommunikation.setBewerber(this);
 	}
+
 
 
 	public long getIdstellenangebot() {

@@ -25,11 +25,13 @@ import com.inisirion.ibm.entities.Bewerber;
 import com.inisirion.ibm.entities.Kommunikation;
 import com.inisirion.ibm.entities.Pdf_Stellenangebot;
 import com.inisirion.ibm.entities.SD_Kanal;
+import com.inisirion.ibm.entities.SD_Kommunikation;
 import com.inisirion.ibm.entities.SD_Status;
 import com.inisirion.ibm.entities.Stellenangebot;
 import com.inisirion.ibm.repository.BewerberRepository;
 import com.inisirion.ibm.repository.Pdf_StellenangebotRepository;
 import com.inisirion.ibm.repository.SD_KanalRepository;
+import com.inisirion.ibm.repository.SD_KommunikationRepository;
 import com.inisirion.ibm.repository.SD_StatusRepository;
 import com.inisirion.ibm.repository.StellenangebotRepository;
 
@@ -53,15 +55,32 @@ public class IbmRestController {
 	@Autowired
 	private  SD_KanalRepository sd_KanalRepository;
 	
+	@Autowired
+	private  SD_KommunikationRepository sd_KommunikationRepository;
 	
 	// ===  Bewerber ====================================================
 
-	// Bewerber zu einem Stellenangebot
+	// alle Bewerber zu einem Stellenangebot
 	@GetMapping("/bewerber/{id}")
 	public List<Bewerber> getBewerberByIdStellenangebot(@PathVariable long id) {
 		
 		// List<Bewerber> list_bewerber = bewerberRepository.findByidstellenangebotOrderByNachname(id);
 		List<Bewerber> list_bewerber = bewerberRepository.findByidstellenangebotOrderById(id);
+		
+		List<Kommunikation> kommunikationen = list_bewerber.get(0).getKommunikationen();
+
+		
+		/*
+		long idstellenangebot = list_bewerber.get(0).getIdstellenangebot();
+		
+		
+		String anmerkungen = kommunikationen.get(0).getAnmerkungen(); // Achtung: ist immer nur eine Anmerkung
+		Bewerber bewerber = kommunikationen.get(0).getBewerber();
+		long id_kommunikation = kommunikationen.get(0).getId();
+		SD_Kommunikation sd_Kommunikation = kommunikationen.get(0).getSd_kommunikation();
+		Date zeitpunkt = kommunikationen.get(0).getZeitpunkt();
+		*/
+				
 		return list_bewerber;
 	}
 
@@ -122,9 +141,20 @@ public class IbmRestController {
 		
 		List<Kommunikation> listKommunikationChanged = bewerberDetails.getKommunikationen();
 		
+		Kommunikation komm = new Kommunikation();
+		komm.setAnmerkungen("Anmerkung wird wohl lüberschrieben?");
+		komm.setBewerber(bewerberDetails);
+		
+		SD_Kommunikation sd_kommunikation = sd_KommunikationRepository.findById(1L).get();
+		komm.setSd_kommunikation(sd_kommunikation);
+		komm.setZeitpunkt(new Date());
+		listKommunikation.add(komm);
+		
+		/*
 		listKommunikationChanged.forEach(listEntry -> {
 			listKommunikation.add(listEntry);
 		});
+		*/
 				
 		bewerber.setKommunikationen(listKommunikation);
 						
@@ -133,9 +163,6 @@ public class IbmRestController {
 		return bew;
 	}
 	
-	
-	
-
 	
 	
 	// ===  Stellenangebote ====================================================
@@ -199,16 +226,16 @@ public class IbmRestController {
 	}
 	
 	
-	// INSERT eines neuen Datensatzes
+	// INSERT eines neuen Stellenangebotes
 	@PostMapping(path= "/stellenangebot", consumes = "application/json", produces = "application/json")
 	public ResponseEntity<Stellenangebot> createStellenangebot(@RequestBody Stellenangebot stellenangebotDetails) {
 
 		// Instantiieren eines neuen Datensatzes
 		Stellenangebot stellenangebot = new Stellenangebot();
 
-		///////////////////////////////////////////////////////
-		// Setzen der Properties im neu anzulegenden Datensatz
-		///////////////////////////////////////////////////////
+		////////////////////////////////////////////////////////////
+		// Setzen der Properties im neu anzulegenden Stellenangebot
+		////////////////////////////////////////////////////////////
 		
 		Date begDate = stellenangebotDetails.getBeginn();
 		stellenangebot.setBeginn(begDate);
@@ -336,6 +363,14 @@ public class IbmRestController {
 
 	// ===  Stammdaten ====================================================
 
+	// Holen aller Stammdaten für Kommunikation 
+	@GetMapping("/sd_kommunikation")
+	@CrossOrigin(origins = "http://localhost:4200")
+	public List<SD_Kommunikation> getAllKommunikation(){
+		List<SD_Kommunikation> list_kommunikation = sd_KommunikationRepository.findAll();		
+		return list_kommunikation;
+	}
+	
 	// Holen aller Stammdaten für Status 
 	@GetMapping("/sd_status")
 	@CrossOrigin(origins = "http://localhost:4200")
