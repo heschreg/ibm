@@ -13,6 +13,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -38,7 +39,8 @@ public class Kommunikation {
 	@Column(name = "anmerkungen")
 	private String anmerkungen;
 	
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne
+	@JsonBackReference
 	private Bewerber bewerber;
 
 	@OneToOne

@@ -7,6 +7,7 @@ import java.util.List;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -15,10 +16,11 @@ import javax.persistence.Table;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 @Entity
 @Table(name = "bewerber")
-@JsonIgnoreProperties(value={"kommunikationen"})  
+// @JsonIgnoreProperties(value={"kommunikationen"})  
 public class Bewerber implements Serializable {
 	
 	@Id
@@ -65,8 +67,10 @@ public class Bewerber implements Serializable {
 	@OneToMany(
 		    mappedBy = "bewerber",
 		    cascade = CascadeType.ALL,
+		    fetch = FetchType.EAGER, 
 		    orphanRemoval = true
 		)
+	@JsonManagedReference
 	private List<Kommunikation> kommunikationen = new ArrayList<>();	
 
 	
@@ -76,13 +80,6 @@ public class Bewerber implements Serializable {
 
 	
 	// === Getter/Setter: =====================
-
-	
-	public void addKommunikation(Kommunikation kommunikation) {
-		kommunikationen.add(kommunikation);
-		kommunikation.setBewerber(this);
-	}
-
 
 
 	public long getIdstellenangebot() {
@@ -204,6 +201,10 @@ public class Bewerber implements Serializable {
 		kommunikationen.remove(kommunikation);
 		kommunikation.setBewerber(null);
 	}	
-	
 
+	public void addKommunikation(Kommunikation kommunikation) {
+		kommunikationen.add(kommunikation);
+		kommunikation.setBewerber(this);
+	}
+	
 }

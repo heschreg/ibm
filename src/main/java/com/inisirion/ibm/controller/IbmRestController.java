@@ -62,17 +62,6 @@ public class IbmRestController {
 	@Autowired
 	private  KommunikationRepository kommunikationRepository;
 	
-	// ===  Kommunikation  ====================================================
-	
-	@GetMapping("/kommunikation/{id_bewerber}")
-	public List<Kommunikation> getKommunikationByIdBewerber(@PathVariable long id_bewerber) {
-		
-		List<Kommunikation> list_komunikation = kommunikationRepository.findBybewerberId(id_bewerber);
-		
-		return list_komunikation;
-	}
-
-
 	
 	// ===  Bewerber ====================================================
 
@@ -133,58 +122,82 @@ public class IbmRestController {
 	}
 
 
-	// UPDATE eines Bewerber-Datensatzes
+	// UPDATE eines Bewerber-Datensatzes und Inserten/Updaten/Deleten von Childds (Kommunikationen
 	@PutMapping(path= "/bewerber/{id}", consumes = "application/json", produces = "application/json")
-	public ResponseEntity<Bewerber> updateBewerber(@PathVariable Long id, @RequestBody Bewerber bewerberDetails){
+	public ResponseEntity<Bewerber> updateBewerber(@PathVariable Long id, @RequestBody Bewerber bewerberChanged){
 		
 		Optional<Bewerber> bewerber_opt = bewerberRepository.findById(id);
 		Bewerber bewerber = bewerber_opt.get();
 		
-		bewerber.setIdstellenangebot(bewerberDetails.getIdstellenangebot());
-		bewerber.setNachname(bewerberDetails.getNachname());
-		bewerber.setVorname(bewerberDetails.getVorname());
-		bewerber.setAnrede(bewerberDetails.getAnrede());
-		bewerber.setTitel(bewerberDetails.getTitel());
-		bewerber.setPlz(bewerberDetails.getPlz());
-		bewerber.setOrt(bewerberDetails.getOrt());
-		bewerber.setStrasse(bewerberDetails.getStrasse());
-		bewerber.setHausnummer(bewerberDetails.getHausnummer());
-		bewerber.setEmail(bewerberDetails.getEmail());
-		bewerber.setNotizen(bewerberDetails.getNotizen());
-		bewerber.setSkills(bewerberDetails.getSkills());
+		bewerber.setIdstellenangebot(bewerberChanged.getIdstellenangebot());
+		bewerber.setNachname(bewerberChanged.getNachname());
+		bewerber.setVorname(bewerberChanged.getVorname());
+		bewerber.setAnrede(bewerberChanged.getAnrede());
+		bewerber.setTitel(bewerberChanged.getTitel());
+		bewerber.setPlz(bewerberChanged.getPlz());
+		bewerber.setOrt(bewerberChanged.getOrt());
+		bewerber.setStrasse(bewerberChanged.getStrasse());
+		bewerber.setHausnummer(bewerberChanged.getHausnummer());
+		bewerber.setEmail(bewerberChanged.getEmail());
+		bewerber.setNotizen(bewerberChanged.getNotizen());
+		bewerber.setSkills(bewerberChanged.getSkills());
 		
-		// Löschen der bisherigen Komminkation
-		List<Kommunikation> listKommunikation = bewerber.getKommunikationen();
-		listKommunikation.clear();
-				
-		/*
-		listKommunikationChanged.forEach(listEntry -> {
-			listKommunikation.add(listEntry);
+		// alle existierenden Historien in "bewerber" wegnehmen
+		int anzEintraege = bewerber.getKommunikationen().size();
+		for (int i = 0; i < anzEintraege; i++)  {
+			Kommunikation komm = bewerber.getKommunikationen().get(0);
+			bewerber.removeKommunikation(komm);			
+		};
+		
+		// Ergänzen aller existierenden Kommunikationens aus "bewerberChanged"
+		bewerberChanged.getKommunikationen().forEach( (k) -> {
+			bewerber.addKommunikation(k);			
 		});
-		*/
-		
-		// Anlage einer neuen Kommunikation
-		Kommunikation komm = new Kommunikation();
-		komm.setSd_kommunikation(sd_KommunikationRepository.findById(1L).get());		
-		komm.setAnmerkungen("Eingang wurde bestätigt?");
-		komm.setBewerber(bewerberDetails);		
-		komm.setZeitpunkt(new Date());
-		listKommunikation.add(komm);
-
-		komm = new Kommunikation();
-		komm.setSd_kommunikation(sd_KommunikationRepository.findById(2L).get());		
-		komm.setAnmerkungen("Rückfrage muss noch geklärt werden?");
-		komm.setBewerber(bewerberDetails);		
-		komm.setZeitpunkt(new Date());
-		listKommunikation.add(komm);
-						
-		bewerber.setKommunikationen(listKommunikation);
 						
 		Bewerber updatedBewerber = bewerberRepository.save(bewerber);		
-		ResponseEntity<Bewerber> bew = ResponseEntity.ok(updatedBewerber);		
+		ResponseEntity<Bewerber> bew = ResponseEntity.ok(updatedBewerber);
+		
 		return bew;
+		
+		/*
+		 * funktionerenden Bsp. zum Ergänzen von Kommunikationshistorien zu einem bestehenden Bewerber
+		 * 
+		 * Der upzudatende Bewerber steht im Parameter "bewerberChanged"
+
+			// 1. Kommunikationshistorie
+			Kommunikation komm = new Kommunikation();
+			komm.setSd_kommunikation(sd_KommunikationRepository.findById(1L).get());		
+			komm.setAnmerkungen("Eingang wurde bestätigt?");
+			komm.setBewerber(bewerberChanged);		
+			komm.setZeitpunkt(new Date());
+			listKommunikation.add(komm);
+	
+			// 2. Kommunikationshistorie
+			komm = new Kommunikation();
+			komm.setSd_kommunikation(sd_KommunikationRepository.findById(2L).get());		
+			komm.setAnmerkungen("Rückfrage muss noch geklärt werden?");
+			komm.setBewerber(bewerberChanged);		
+			komm.setZeitpunkt(new Date());
+			listKommunikation.add(komm);
+
+			bewerber.setKommunikationen(listKommunikation);
+		 
+			Bewerber updatedBewerber = bewerberRepository.save(bewerber);		
+			ResponseEntity<Bewerber> bew = ResponseEntity.ok(updatedBewerber);		
+			return bew;
+		 */		
 	}
 	
+	
+	// ===  Kommunikation (wird wohl gar nicht benötigt) ========================================
+	
+	@GetMapping("/kommunikation/{id_bewerber}")
+	public List<Kommunikation> getKommunikationByIdBewerber(@PathVariable long id_bewerber) {
+		
+		List<Kommunikation> list_komunikation = kommunikationRepository.findBybewerberId(id_bewerber);
+		
+		return list_komunikation;
+	}
 	
 	
 	// ===  Stellenangebote ====================================================
