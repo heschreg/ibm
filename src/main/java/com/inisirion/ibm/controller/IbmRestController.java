@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -72,15 +73,10 @@ public class IbmRestController {
 		// List<Bewerber> list_bewerber = bewerberRepository.findByidstellenangebotOrderByNachname(id);
 		List<Bewerber> list_bewerber = bewerberRepository.findByidstellenangebotOrderById(id);
 		
-		List<Kommunikation> kommunikationen = list_bewerber.get(0).getKommunikationen();
-		// Aufgrund JsonIgnoreProperty bzgl. Kommunikation in der Entität "bewerber" wird
-        // die Kommunkationshistorie nicht deserialisiert		
 		/*
-		long idstellenangebot = list_bewerber.get(0).getIdstellenangebot();
-		
-		
-		String anmerkungen                
-		= kommunikationen.get(0).getAnmerkungen(); // Achtung: ist immer nur eine Anmerkung
+		List<Kommunikation> kommunikationen = list_bewerber.get(0).getKommunikationen();
+				
+		String anmerkungen                = kommunikationen.get(0).getAnmerkungen(); // Achtung: ist immer nur eine Anmerkung
 		Bewerber bewerber                 = kommunikationen.get(0).getBewerber();
 		long id_kommunikation             = kommunikationen.get(0).getId();
 		SD_Kommunikation sd_kommunikation = kommunikationen.get(0).getSd_kommunikation();
@@ -92,31 +88,50 @@ public class IbmRestController {
 
 	// INSERT eines neuen Datensatzes
 	@PostMapping(path= "/bewerber", consumes = "application/json", produces = "application/json")
-	public ResponseEntity<Bewerber> createBewerber(@RequestBody Bewerber bewerberDetails) {
+	@Transactional
+	public ResponseEntity<Bewerber> createBewerber(@RequestBody Bewerber bewerberNew) {
 
+		ResponseEntity<Bewerber> bew;
+				
 		// Instantiieren eines neuen Datensatzes
 		Bewerber bewerber = new Bewerber();
 
 		///////////////////////////////////////////////////////
-		// Setzen der Properties im neu anzulegenden Datensatz
+		// Setzen der Properties des neu anzulegenden Bewerbers
 		///////////////////////////////////////////////////////
-		bewerber.setIdstellenangebot(bewerberDetails.getIdstellenangebot());
-		bewerber.setNachname(bewerberDetails.getNachname());
-		bewerber.setVorname(bewerberDetails.getVorname());
-		bewerber.setAnrede(bewerberDetails.getAnrede());
-		bewerber.setTitel(bewerberDetails.getTitel());
-		bewerber.setPlz(bewerberDetails.getPlz());
-		bewerber.setOrt(bewerberDetails.getOrt());
-		bewerber.setStrasse(bewerberDetails.getStrasse());
-		bewerber.setHausnummer(bewerberDetails.getHausnummer());
-		bewerber.setEmail(bewerberDetails.getEmail());
-		bewerber.setNotizen(bewerberDetails.getNotizen());
-		bewerber.setSkills(bewerberDetails.getSkills());
-		bewerber.setKommunikationen(bewerberDetails.getKommunikationen());
-				
-		Bewerber newBewerber = bewerberRepository.save(bewerber);
 		
-		ResponseEntity<Bewerber> bew = ResponseEntity.ok(newBewerber);
+		bewerber.setIdstellenangebot(bewerberNew.getIdstellenangebot());
+		bewerber.setNachname(bewerberNew.getNachname());
+		bewerber.setVorname(bewerberNew.getVorname());
+		bewerber.setAnrede(bewerberNew.getAnrede());
+		bewerber.setTitel(bewerberNew.getTitel());
+		bewerber.setPlz(bewerberNew.getPlz());
+		bewerber.setOrt(bewerberNew.getOrt());
+		bewerber.setStrasse(bewerberNew.getStrasse());
+		bewerber.setHausnummer(bewerberNew.getHausnummer());
+		bewerber.setEmail(bewerberNew.getEmail());
+		bewerber.setNotizen(bewerberNew.getNotizen());
+		bewerber.setSkills(bewerberNew.getSkills());
+		Bewerber BewerberInserted = bewerberRepository.save(bewerber);
+		
+		List<Kommunikation> kommunikationenNew = bewerberNew.getKommunikationen();		
+		if (kommunikationenNew.size() > 0 ) {
+			
+			// Inserten aller bei der Anlage eines Bewerbers gleich mit angelegten Kommunikationshistorien
+			
+			BewerberInserted =  bewerberRepository.findById( BewerberInserted.getId()).get();
+
+			int anzEintraege = bewerberNew.getKommunikationen().size();
+			for (int i = 0; i < anzEintraege; i++)  {
+				BewerberInserted.addKommunikation(bewerberNew.getKommunikationen().get(i));
+			};
+			
+			Bewerber BewerberInsertedMitAnlagen = bewerberRepository.save(BewerberInserted);
+			
+			bew = ResponseEntity.ok(BewerberInsertedMitAnlagen);
+		} else {
+			bew = ResponseEntity.ok(BewerberInserted);			
+		}
 		
 		return bew;
 	}
