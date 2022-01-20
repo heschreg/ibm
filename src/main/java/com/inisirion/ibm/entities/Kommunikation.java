@@ -36,8 +36,8 @@ public class Kommunikation {
     @JsonDeserialize(using = IbmDateDeserializer.class)    	
 	private Date zeitpunkt;
 	
-	@Column(name = "anmerkungen")
-	private String anmerkungen;
+	@Column(name = "anmerkung")
+	private String anmerkung;
 	
 	@ManyToOne
 	@JsonBackReference
@@ -69,12 +69,12 @@ public class Kommunikation {
 		this.zeitpunkt = zeitpunkt;
 	}
 
-	public String getAnmerkungen() {
-		return anmerkungen;
+	public String getAnmerkung() {
+		return anmerkung;
 	}
 
-	public void setAnmerkungen(String anmerkungen) {
-		this.anmerkungen = anmerkungen;
+	public void setAnmerkung(String anmerkung) {
+		this.anmerkung = anmerkung;
 	}
 
 	public Bewerber getBewerber() {

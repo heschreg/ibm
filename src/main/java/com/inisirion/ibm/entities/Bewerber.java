@@ -14,6 +14,9 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
@@ -21,6 +24,7 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 @Entity
 @Table(name = "bewerber")
 // @JsonIgnoreProperties(value={"kommunikationen"})  
+// @JsonIgnoreProperties(value={"anlagen"})  
 public class Bewerber implements Serializable {
 	
 	@Id
@@ -70,9 +74,20 @@ public class Bewerber implements Serializable {
 		    fetch = FetchType.EAGER, 
 		    orphanRemoval = true
 		)
+	@LazyCollection(LazyCollectionOption.FALSE)
 	@JsonManagedReference
 	private List<Kommunikation> kommunikationen = new ArrayList<>();	
 
+	//fetch = FetchType.EAGER, 
+	@OneToMany(
+		    mappedBy = "bewerber",
+		    cascade = CascadeType.ALL,
+		    orphanRemoval = true		    
+		)
+	@LazyCollection(LazyCollectionOption.FALSE)
+	@JsonManagedReference
+	private List<Anlage> anlagen = new ArrayList<>();	
+	
 	
 	// === Constructors =====================
 
@@ -189,6 +204,7 @@ public class Bewerber implements Serializable {
 		this.skills = skills;
 	}
 
+	
 	public List<Kommunikation> getKommunikationen() {
 		return kommunikationen;
 	}
@@ -197,6 +213,18 @@ public class Bewerber implements Serializable {
 		this.kommunikationen = kommunikationen;
 	}
 
+	public List<Anlage> getAnlagen() {
+		return anlagen;
+	}
+
+
+	public void setAnlagen(List<Anlage> anlagen) {
+		this.anlagen = anlagen;
+	}
+
+	
+	// Hilfsmethoden bzgl. der Many-Relation zur Entität "kommunikation"
+	
 	public void removeKommunikation(Kommunikation kommunikation) {
 		kommunikationen.remove(kommunikation);
 		kommunikation.setBewerber(null);
@@ -205,6 +233,18 @@ public class Bewerber implements Serializable {
 	public void addKommunikation(Kommunikation kommunikation) {
 		kommunikationen.add(kommunikation);
 		kommunikation.setBewerber(this);
+	}
+
+	// Hilfsmethoden bzgl. der Many-Relation zur Entität "anlage"
+
+	public void removeAnlage(Anlage anlage) {
+		anlagen.remove(anlage);
+		anlage.setBewerber(null);
+	}	
+
+	public void addAnlage(Anlage anlage) {
+		anlagen.add(anlage);
+		anlage.setBewerber(this);
 	}
 	
 }

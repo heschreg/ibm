@@ -22,9 +22,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.inisirion.ibm.entities.Anlage;
 import com.inisirion.ibm.entities.Bewerber;
 import com.inisirion.ibm.entities.Kommunikation;
 import com.inisirion.ibm.entities.Pdf_Stellenangebot;
+import com.inisirion.ibm.entities.SD_Anlage;
 import com.inisirion.ibm.entities.SD_Kanal;
 import com.inisirion.ibm.entities.SD_Kommunikation;
 import com.inisirion.ibm.entities.SD_Status;
@@ -32,6 +34,7 @@ import com.inisirion.ibm.entities.Stellenangebot;
 import com.inisirion.ibm.repository.BewerberRepository;
 import com.inisirion.ibm.repository.KommunikationRepository;
 import com.inisirion.ibm.repository.Pdf_StellenangebotRepository;
+import com.inisirion.ibm.repository.SD_AnlageRepository;
 import com.inisirion.ibm.repository.SD_KanalRepository;
 import com.inisirion.ibm.repository.SD_KommunikationRepository;
 import com.inisirion.ibm.repository.SD_StatusRepository;
@@ -51,6 +54,12 @@ public class IbmRestController {
 	@Autowired
 	private  Pdf_StellenangebotRepository pdf_StellenangebotRepository;
 
+	/*
+	@Autowired
+	private  KommunikationRepository kommunikationRepository;
+	*/
+	
+	
 	@Autowired
 	private  SD_StatusRepository sd_StatusRepository;
 
@@ -61,8 +70,8 @@ public class IbmRestController {
 	private  SD_KommunikationRepository sd_KommunikationRepository;
 
 	@Autowired
-	private  KommunikationRepository kommunikationRepository;
-	
+	private  SD_AnlageRepository sd_AnlageRepository;
+
 	
 	// ===  Bewerber ====================================================
 
@@ -209,8 +218,8 @@ public class IbmRestController {
 	@GetMapping("/kommunikation/{id_bewerber}")
 	public List<Kommunikation> getKommunikationByIdBewerber(@PathVariable long id_bewerber) {
 		
-		List<Kommunikation> list_komunikation = kommunikationRepository.findBybewerberId(id_bewerber);
-		
+		// List<Kommunikation> list_komunikation = kommunikationRepository.findBybewerberId(id_bewerber);
+		List<Kommunikation> list_komunikation = null;
 		return list_komunikation;
 	}
 	
@@ -310,6 +319,68 @@ public class IbmRestController {
 		
 		return sa;
 	}
+	
+	/***************************************************************************************
+	 * 
+	 * POST: UPLOAD Pdf mit Verknüpfung zur zentralen Entität  "stellenangebot" 
+	 * Parameter 1: Id des betroffenen Stellenangebots 
+	 * Parameter 2: Multifile-Parameter bgzl. der upzuloadenden pdf-Datei 
+	 * 
+	 * Aufruf im Frontend:
+	 * ===================
+	 * 
+	 * const uploadData = new FormData();
+     * uploadData.append('pdfFile', pdfFile, pdfFile.name);
+     * 
+	 * @PostMapping(path = "/uploadpdfsa/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+     * return this.httpClient.post(`localhost:8080/ibm/uploadpdfsa/${id}`, uploadData);
+     * 
+	 *****************************************************************************************/
+	
+	@PostMapping(path = "/uploadpdfanlage/{id_bewerber}", produces = MediaType.APPLICATION_JSON_VALUE)
+	public  ResponseEntity<Bewerber> uploadPdfAnlage(
+			@PathVariable Long id_bewerber, 
+			@RequestParam("id_sd_anlage") String sIdAnlage, 
+			@RequestParam("anmerkung")   String anmerkung, 
+			@RequestParam("pdfFile") MultipartFile pdfDatei
+		) throws IOException {
+		
+		// Holen der Bewerber - Entität anhand der übergebenen id_bewerber
+		Bewerber bewerber = bewerberRepository.findById(id_bewerber).get();
+		
+		// Verarbeiten der übergebenen PDF-Datei
+		String pdfFilename = StringUtils.cleanPath(pdfDatei.getOriginalFilename());
+		String pdfContentType = pdfDatei.getContentType();
+		byte[] pdfBytes = pdfDatei.getBytes();
+		
+		// Pdf_Stellenangebot pdfStellenangebot = new Pdf_Stellenangebot(pdfFilename, pdfContentType, pdfDatei.getBytes());		
+		List<Anlage> list_anlage = bewerber.getAnlagen();
+			
+		Anlage anlage = new Anlage();
+		
+		anlage.setBewerber(bewerber);
+		
+		long id_sd_anlage = Long.parseLong(sIdAnlage.trim());
+		SD_Anlage sdAnlage = sd_AnlageRepository.findById(id_sd_anlage).get();				
+		anlage.setSd_anlage(sdAnlage);
+
+		anlage.setAnmerkung(anmerkung);
+
+		anlage.setName(pdfFilename);
+		anlage.setType(pdfContentType);
+		anlage.setBinData(pdfBytes);
+
+		list_anlage.add(anlage);
+		
+		bewerber.setAnlagen(list_anlage);
+				
+		Bewerber updatedBewerber = bewerberRepository.save(bewerber);
+		
+		ResponseEntity<Bewerber> bew = ResponseEntity.ok(updatedBewerber);
+		
+		return bew;		
+	}
+	
 
 	// =======================================================================
 
@@ -412,13 +483,21 @@ public class IbmRestController {
 	}	
 
 	// ===  Stammdaten ====================================================
-
+	
 	// Holen aller Stammdaten für Kommunikation 
 	@GetMapping("/sd_kommunikation")
 	@CrossOrigin(origins = "http://localhost:4200")
 	public List<SD_Kommunikation> getAllKommunikation(){
 		List<SD_Kommunikation> list_kommunikation = sd_KommunikationRepository.findAll();		
 		return list_kommunikation;
+	}
+
+	// Holen aller Stammdaten für Anlage
+	@GetMapping("/sd_anlage")
+	@CrossOrigin(origins = "http://localhost:4200")
+	public List<SD_Anlage> getAllAnlage(){
+		List<SD_Anlage> list_anlage = sd_AnlageRepository.findAll();		
+		return list_anlage;
 	}
 	
 	// Holen aller Stammdaten für Status 

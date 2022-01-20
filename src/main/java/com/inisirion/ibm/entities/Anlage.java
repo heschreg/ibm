@@ -5,22 +5,29 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 @Entity
-@Table(name = "bewerber_anlagen")
-public class Bewerber_Anlagen {
+@Table(name = "anlage")
+public class Anlage {
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long id;
 	
-	@Column(name = "id_bewerber", nullable=false)
-	private long id_bewerber;
+	@Column(name = "anmerkung")
+	private String anmerkung;
 	
+		
 	@Column(name = "name")
     private String name;
 
+	// zB: pdf oder Word
     @Column(name = "type")
     private String type;
 
@@ -28,38 +35,30 @@ public class Bewerber_Anlagen {
     // which is more than the default length for binData column
     @Column(name = "binData", length = 10000000)
     private byte[] binData;
+    
+    @ManyToOne
+	@JsonBackReference
+	private Bewerber bewerber;
+    
+    @OneToOne
+	@JoinColumn (name = "sd_anlage_id", nullable = false)
+	private SD_Anlage sd_anlage;	
 
     
     // === Constructors =====================
     
-	public Bewerber_Anlagen() {
+	public Anlage() {
 		super();
 	}
 
-	public Bewerber_Anlagen(long id_bewerber, String name, String type, byte[] binData) {
-		super();
-		this.id_bewerber = id_bewerber;
-		this.name = name;
-		this.type = type;
-		this.binData = binData;
-	}
-
-	// === Getter/Setter =====================
-		
+	// === Getter/Setter =====================	
+	
 	public long getId() {
 		return id;
 	}
 
 	public void setId(long id) {
 		this.id = id;
-	}
-
-	public long getId_bewerber() {
-		return id_bewerber;
-	}
-
-	public void setId_bewerber(long id_bewerber) {
-		this.id_bewerber = id_bewerber;
 	}
 
 	public String getName() {
@@ -73,6 +72,14 @@ public class Bewerber_Anlagen {
 	public String getType() {
 		return type;
 	}
+	
+	public String getAnmerkung() {
+		return anmerkung;
+	}
+
+	public void setAnmerkung(String anmerkung) {
+		this.anmerkung = anmerkung;
+	}
 
 	public void setType(String type) {
 		this.type = type;
@@ -85,5 +92,23 @@ public class Bewerber_Anlagen {
 	public void setBinData(byte[] binData) {
 		this.binData = binData;
 	}
+
+	public Bewerber getBewerber() {
+		return bewerber;
+	}
+
+	public void setBewerber(Bewerber bewerber) {
+		this.bewerber = bewerber;
+	}
+
+	public SD_Anlage getSd_anlage() {
+		return sd_anlage;
+	}
+
+	public void setSd_anlage(SD_Anlage sd_anlage) {
+		this.sd_anlage = sd_anlage;
+	}
+		
+	
 	
 }

@@ -8,8 +8,8 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "SD_Kommunikation")
-public class SD_Kommunikation {
+@Table(name = "SD_Anlage")
+public class SD_Anlage {
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -18,18 +18,24 @@ public class SD_Kommunikation {
 	@Column(name = "bezeichnung", nullable=false)
 	private String bezeichnung;
 
+	
 	// === Constructors =====================
 
-	public SD_Kommunikation() {	}
-		
+	public SD_Anlage() {	}	
 	
-	public SD_Kommunikation(String bezeichnung) {
+	public SD_Anlage(String bezeichnung) {
 		super();
 		this.bezeichnung = bezeichnung;
 	}
-
+	
+	public SD_Anlage(long id, String bezeichnung) {
+		super();
+		this.id = id;
+		this.bezeichnung = bezeichnung;
+	}	
+	
 	// === Getter/Setter: =====================
-
+	
 	public long getId() {
 		return id;
 	}
@@ -45,11 +51,5 @@ public class SD_Kommunikation {
 	public void setBezeichnung(String bezeichnung) {
 		this.bezeichnung = bezeichnung;
 	}
-
-	public SD_Kommunikation(long id, String bezeichnung) {
-		super();
-		this.id = id;
-		this.bezeichnung = bezeichnung;
-	}	
 
 }

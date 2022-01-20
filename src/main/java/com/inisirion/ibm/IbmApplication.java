@@ -21,11 +21,13 @@ import org.springframework.stereotype.Component;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.inisirion.ibm.entities.Pdf_Stellenangebot;
+import com.inisirion.ibm.entities.SD_Anlage;
 import com.inisirion.ibm.entities.SD_Kanal;
 import com.inisirion.ibm.entities.SD_Kommunikation;
 import com.inisirion.ibm.entities.SD_Status;
 import com.inisirion.ibm.entities.Stellenangebot;
 import com.inisirion.ibm.repository.Pdf_StellenangebotRepository;
+import com.inisirion.ibm.repository.SD_AnlageRepository;
 import com.inisirion.ibm.repository.SD_KanalRepository;
 import com.inisirion.ibm.repository.SD_KommunikationRepository;
 import com.inisirion.ibm.repository.SD_StatusRepository;
@@ -59,12 +61,17 @@ public class IbmApplication {
 		@Autowired 
 		SD_KommunikationRepository sdKommunikationRepository;
 		
+		@Autowired 
+		SD_AnlageRepository sdAnlageRepository;
 		
 		@Override
 		public void run(String... args) throws Exception {
 
 			// Anlage von Stammdaten 
-			// this.insert_stammdaten();
+			// this.insert_SD_Status();
+			// this.insert_SD_Kanal();
+			// this.insert_SD_Kommunikation();
+			// this.insert_SD_Anlage();
 
 			// Anlage von 3 Stellenangeboten 
 			// this.insert_stellenangebote();
@@ -72,7 +79,7 @@ public class IbmApplication {
 			// funkionierendes Bsp, um ein Objekt mit einer Property vom Typ "Date" zu serialisieren ===> {"startdateemployee": "21.04.2021"}
 			// this.exampleJsonSerializer();
 			
-			// funkionierendes Bsp, um einen Json: {"dateemployee": "21.04.2021"} in ein  Objekt mit einer Poperty vom Typ "Date" zu deserialisieren
+			// funkionierendes Bsp, um einen Json: {"dateemployee": "21.04.2021"} in ein  Objekt mit Popertytyp "Date" zu deserialisieren
 			//  this.exampleJsonDeserializer();
 		}
 		
@@ -120,20 +127,23 @@ public class IbmApplication {
 		}
 					
 		
-		//  nur ein erster Versuch
 		/*
-		@Bean
-		MappingJackson2HttpMessageConverter mappingJackson2HttpMessageConverter() {
-		    return new CustomHttpMessageConverter();
-		}
-		*/		
-		
-		
-		/*
-		 * Anlegen von Stammdaten für Status und Kanäle
-		 * 
+		 * Anlegen von Stammdaten
 		 */
-		private void insert_stammdaten() {
+		
+		private void insert_SD_Anlage() {
+			
+			sdAnlageRepository.save(new SD_Anlage("Lebenslauf"));
+			sdAnlageRepository.save(new SD_Anlage("Anschreiben"));
+			sdAnlageRepository.save(new SD_Anlage("Arbeitszeugnis"));
+			sdAnlageRepository.save(new SD_Anlage("Fortbildung"));
+			sdAnlageRepository.save(new SD_Anlage("Sonstiges"));
+					
+			return;
+		}
+
+		
+		private void insert_SD_Kommunikation() {
 			
 			sdKommunikationRepository.save(new SD_Kommunikation("Eingang"));
 			sdKommunikationRepository.save(new SD_Kommunikation("Rückfrage"));
@@ -145,12 +155,22 @@ public class IbmApplication {
 			sdKommunikationRepository.save(new SD_Kommunikation("Zweitinterview"));
 			sdKommunikationRepository.save(new SD_Kommunikation("Einstellung"));			
 			
+			return;
+		}
+		
+		private void insert_SD_Status() {
+			
 			sdStatusRepository.save(new SD_Status(444441L, "in Vorbereitung"));
 			sdStatusRepository.save(new SD_Status(444442L, "online"));
 			sdStatusRepository.save(new SD_Status(444443L, "eingestellt"));
 			sdStatusRepository.save(new SD_Status(444444L, "abgesagt"));
 			sdStatusRepository.save(new SD_Status(444445L, "pausieren"));
-
+					
+			return;
+		}
+		
+		private void insert_SD_Kanal() {
+			
 			sdKanalRepository.save(new SD_Kanal(555551L, "Presse"));
 			sdKanalRepository.save(new SD_Kanal(555552L, "Jobbörse"));
 			sdKanalRepository.save(new SD_Kanal(555553L, "Xing"));
@@ -160,6 +180,7 @@ public class IbmApplication {
 			return;
 		}
 		
+
 		/*
 		 * Anlegen von Stellenangeboten inkl. der Verknüpfungen für die abhängigen Tabellen
 		 * 
