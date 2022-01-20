@@ -2,7 +2,9 @@ package com.inisirion.ibm.controller;
 
 import java.io.IOException;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -220,15 +223,149 @@ public class IbmRestController {
 	}
 	
 	
-	// ===  Kommunikation (wird wohl gar nicht benötigt) ========================================
 	
-	@GetMapping("/kommunikation/{id_bewerber}")
+	// ===  Kommunikation (wird wohl gar nicht benötigt) ========================================
+	/*
 	public List<Kommunikation> getKommunikationByIdBewerber(@PathVariable long id_bewerber) {
 		
 		// List<Kommunikation> list_komunikation = kommunikationRepository.findBybewerberId(id_bewerber);
 		List<Kommunikation> list_komunikation = null;
 		return list_komunikation;
 	}
+	*/
+
+	/************************************************************************************************
+	 * 
+	 *  POST: UPLOAD Pdf mit Verknüpfung zur zentralen Entität  "bewerber"
+	 * 
+	 *  1 Path-Parameter:
+	 *  =================
+	 *  Long id_bewerber : Verweis auf die Bewerberentität, der die Anlage hinzuzufügen ist
+	 *  
+	 *  3 Request-Parameter:
+	 *  =================
+	 *  "id_sd_anlage": id der zugehörigen Kategorie (Lebenslauf, Arbeitszeugnis Anschreiben ...) 
+	 *  "anmerkung":    individuell im Frontend eingegebene Anmerkung
+	 *  "pdfFile"       Objekt vom Typ "MultipartFile" (Dateiname, Dateityp, content in Bytes
+	 *  
+	 * 
+	 *  Aufruf im Frontend:
+	 *  ===================
+	 * 
+	 * 	const formData = new FormData();
+     *	formData.append("id_sd_anlage", anlage.sd_anlage.id.toString());
+     *	formData.append("anmerkung", anlage.anmerkung);
+     *	formData.append('pdfFile', pdfFile, pdfFile.name);
+     *	return this.httpClient.post(`${this.baseURL}/upldpdfanlage/${id}`, formData);
+     * 
+	 *****************************************************************************************/
+	
+	@PostMapping(path = "/upldpdfanlage/{id_bewerber}", produces = MediaType.APPLICATION_JSON_VALUE)
+	public  ResponseEntity<Bewerber> uploadPdfAnlage(
+			@PathVariable Long id_bewerber, 
+			@RequestParam("id_sd_anlage") String sIdAnlage, 
+			@RequestParam("anmerkung")   String anmerkung, 
+			@RequestParam("pdfFile") MultipartFile pdfDatei
+		) throws IOException {
+		
+		// Holen der Bewerber - Entität anhand der übergebenen id_bewerber
+		Bewerber bewerber = bewerberRepository.findById(id_bewerber).get();
+		
+		// Verarbeiten der übergebenen PDF-Datei
+		String pdfFilename = StringUtils.cleanPath(pdfDatei.getOriginalFilename());
+		String pdfContentType = pdfDatei.getContentType();
+		byte[] pdfBytes = pdfDatei.getBytes();
+		
+		// Pdf_Stellenangebot pdfStellenangebot = new Pdf_Stellenangebot(pdfFilename, pdfContentType, pdfDatei.getBytes());		
+		List<Anlage> list_anlage = bewerber.getAnlagen();
+			
+		Anlage anlage = new Anlage();
+		
+		anlage.setBewerber(bewerber);
+		
+		long id_sd_anlage = Long.parseLong(sIdAnlage.trim());
+		SD_Anlage sdAnlage = sd_AnlageRepository.findById(id_sd_anlage).get();				
+		anlage.setSd_anlage(sdAnlage);
+
+		anlage.setAnmerkung(anmerkung);
+
+		anlage.setName(pdfFilename);
+		anlage.setType(pdfContentType);
+		anlage.setBinData(pdfBytes);
+
+		list_anlage.add(anlage);
+		
+		bewerber.setAnlagen(list_anlage);
+				
+		Bewerber updatedBewerber = bewerberRepository.save(bewerber);
+		
+		ResponseEntity<Bewerber> bew = ResponseEntity.ok(updatedBewerber);
+		
+		return bew;		
+	}
+
+	/********************************************************************************************************************
+	 * 
+	 *  GET: Vorbereiten eines Bytestreams, der von windows.Open(url) im FE benötigt wird
+	 * 
+	 *  Funktionsdefinition in anlageRepository:
+	 *  ========================================
+	 *  
+	 *  @Query( value = "SELECT * FROM anlage u WHERE u.id = :id and u.bewerber_id = :bewerber_id", nativeQuery = true)
+		List<Anlage> findAllActiveAnlageNative(
+			@Param("id") Long id, 
+			@Param("bewerber_id") Long bewreber_id			
+		);	
+	 *
+	 *  Aufruf im Frontend:
+	 *  ===================
+	 * 
+     *	const filestreamUrl = `${this.baseURL}/file/${id}/${bewerber_id}`;
+     *  window.open(filestreamUrl);
+     * 
+     * INNERHALB VON WINDOWS.OPEN() WIRD DIESER ENDPOINT AUFGERUFEN UND DAS STREAMING INITIIERT
+     * 
+	 **********************************************************************************************************************/
+		
+	@GetMapping("/file/{id}/{bewerber_id}")
+	public ResponseEntity<byte[]> getBinaryFileFromQuery(@PathVariable Long id, @PathVariable Long bewerber_id) {
+		  		
+		// Es kann als Ergebnis nur genau 1 Datensatz zurückkkommen
+		List<Anlage> list_anlage = anlageRepository.findAllActiveAnlageNative(id, bewerber_id);
+		
+		if (list_anlage.size() == 1) {
+			Anlage anlage = list_anlage.get(0);
+
+		    String fname = anlage.getName();
+		    byte[] datenbytes = anlage.getBinData(); // binäre Daten, die das pdf-Dokument repräsentieren
+
+		    ResponseEntity<byte[]> bbytes =  ResponseEntity
+		    		.ok()
+		            .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fname + "\"")
+		            .body(datenbytes);
+		    
+		    return bbytes;	   
+			
+		} else {			
+			return null;
+		}	    
+	}	
+
+	
+	@DeleteMapping("/file/{id}/{bewerber_id}")
+	public Map<String, Boolean> deleteAnlage(@PathVariable(value = "id") Long id, @PathVariable Long bewerber_id) {
+
+		Map<String, Boolean> response = new HashMap<>();
+	
+		// Es wird dadurch genau 1 Datensatz gelöscht
+		anlageRepository.deleteOneAnlageNative(id, bewerber_id);
+				
+		response.put("deleted", Boolean.TRUE);
+		
+		return response;
+					
+	}
+	
 	
 	
 	// ===  Stellenangebote ====================================================
@@ -327,146 +464,6 @@ public class IbmRestController {
 		return sa;
 	}
 	
-	/************************************************************************************************
-	 * 
-	 *  POST: UPLOAD Pdf mit Verknüpfung zur zentralen Entität  "bewerber"
-	 * 
-	 *  1 Path-Parameter:
-	 *  =================
-	 *  Long id_bewerber : Verweis auf die Bewerberentität, der die Anlage hinzuzufügen ist
-	 *  
-	 *  3 Request-Parameter:
-	 *  =================
-	 *  "id_sd_anlage": id der zugehörigen Kategorie (Lebenslauf, Arbeitszeugnis Anschreiben ...) 
-	 *  "anmerkung":    individuell im Frontend eingegebene Anmerkung
-	 *  "pdfFile"       Objekt vom Typ "MultipartFile" (Dateiname, Dateityp, content in Bytes
-	 *  
-	 * 
-	 *  Aufruf im Frontend:
-	 *  ===================
-	 * 
-	 * 	const formData = new FormData();
-     *	formData.append("id_sd_anlage", anlage.sd_anlage.id.toString());
-     *	formData.append("anmerkung", anlage.anmerkung);
-     *	formData.append('pdfFile', pdfFile, pdfFile.name);
-     *	return this.httpClient.post(`${this.baseURL}/upldpdfanlage/${id}`, formData);
-     * 
-	 *****************************************************************************************/
-	
-	@PostMapping(path = "/upldpdfanlage/{id_bewerber}", produces = MediaType.APPLICATION_JSON_VALUE)
-	public  ResponseEntity<Bewerber> uploadPdfAnlage(
-			@PathVariable Long id_bewerber, 
-			@RequestParam("id_sd_anlage") String sIdAnlage, 
-			@RequestParam("anmerkung")   String anmerkung, 
-			@RequestParam("pdfFile") MultipartFile pdfDatei
-		) throws IOException {
-		
-		// Holen der Bewerber - Entität anhand der übergebenen id_bewerber
-		Bewerber bewerber = bewerberRepository.findById(id_bewerber).get();
-		
-		// Verarbeiten der übergebenen PDF-Datei
-		String pdfFilename = StringUtils.cleanPath(pdfDatei.getOriginalFilename());
-		String pdfContentType = pdfDatei.getContentType();
-		byte[] pdfBytes = pdfDatei.getBytes();
-		
-		// Pdf_Stellenangebot pdfStellenangebot = new Pdf_Stellenangebot(pdfFilename, pdfContentType, pdfDatei.getBytes());		
-		List<Anlage> list_anlage = bewerber.getAnlagen();
-			
-		Anlage anlage = new Anlage();
-		
-		anlage.setBewerber(bewerber);
-		
-		long id_sd_anlage = Long.parseLong(sIdAnlage.trim());
-		SD_Anlage sdAnlage = sd_AnlageRepository.findById(id_sd_anlage).get();				
-		anlage.setSd_anlage(sdAnlage);
-
-		anlage.setAnmerkung(anmerkung);
-
-		anlage.setName(pdfFilename);
-		anlage.setType(pdfContentType);
-		anlage.setBinData(pdfBytes);
-
-		list_anlage.add(anlage);
-		
-		bewerber.setAnlagen(list_anlage);
-				
-		Bewerber updatedBewerber = bewerberRepository.save(bewerber);
-		
-		ResponseEntity<Bewerber> bew = ResponseEntity.ok(updatedBewerber);
-		
-		return bew;		
-	}
-
-	/************************************************************************************************
-	 * 
-	 *  GET: Vorbereiten eines Bytestreams, der von windows.Open(url) im FE benötigt wird
-	 * 
-	 *  Path-Parameter:
-	 *  =================
-	 *  Long id_anlagw: Verweis auf den Datensatz in der Entität "anlage", der  die byte-Daten enthält
-	 *  
-	 *  Funktionsdefinition in anlageRepository:
-	 *  ========================================
-	 *  
-	 *  @Query( value = "SELECT * FROM anlage u WHERE u.id = :id and u.bewerber_id = :bewerber_id", nativeQuery = true)
-		List<Anlage> findAllActiveAnlageNative(
-			@Param("id") Long id, 
-			@Param("bewerber_id") Long bewreber_id			
-		);	
-	 *
-	 *  Aufruf im Frontend:
-	 *  ===================
-	 * 
-     *	return this.httpClient.get(`${this.baseURL}/file/${id}`);
-     * 
-	 *****************************************************************************************/
-		
-	@GetMapping("/file/{id}/{bewerber_id}")
-	public ResponseEntity<byte[]> getBinaryFileFromQuery(@PathVariable Long id, @PathVariable Long bewerber_id) {
-		  		
-		// Es kann als Ergebnis nur genau 1 Datensatz zurückkkommen
-		List<Anlage> list_anlage = anlageRepository.findAllActiveAnlageNative(id, bewerber_id);
-		
-		if (list_anlage.size() == 1) {
-			Anlage anlage = list_anlage.get(0);
-
-		    String fname = anlage.getName();
-		    byte[] datenbytes = anlage.getBinData(); // binäre Daten, die das pdf-Dokument repräsentieren
-
-		    ResponseEntity<byte[]> bbytes =  ResponseEntity
-		    		.ok()
-		            .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fname + "\"")
-		            .body(datenbytes);
-		    
-		    return bbytes;	   
-			
-		} else {
-			
-			return null;
-		}
-	    
-	}	
-
-	
-	@GetMapping("/file/{id}")
-	public ResponseEntity<byte[]> getBinaryFile(@PathVariable Long id) {
-		  		
-		Optional<Anlage> anlageOpt = anlageRepository.findById(id);
-		Anlage anlage = anlageOpt.get();
-	    
-	    String fname = anlage.getName();
-	    byte[] datenbytes = anlage.getBinData(); // binäre Daten, die das pdf-Dokument repräsentieren
-
-	    ResponseEntity<byte[]> bbytes =  ResponseEntity
-	    		.ok()
-	            .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fname + "\"")
-	            .body(datenbytes);
-	    
-	    return bbytes;	   
-	}	
-
-	// =======================================================================
-
 	/***************************************************************************************
 	 * 
 	 * POST: UPLOAD Pdf mit Verknüpfung zur zentralen Entität  "stellenangebot" 
@@ -512,7 +509,7 @@ public class IbmRestController {
 
 
 	/************************************************************************************************************/
-	/** DOWNLOAD Pdf-Bytes für windows.open ( BinaryDate ) über die Id in der Tabelle "ibm.pdf_stellenangebot" **/
+	/** DOWNLOAD Pdf-Bytes für windows.open ( BinaryData ) über die Id in der Tabelle "ibm.pdf_stellenangebot" **/
 	/************************************************************************************************************/
 	@GetMapping(path = { "/dnldpdfbyid/{id}" })
 	public ResponseEntity<byte[]> getBinaryFileByName(@PathVariable("id") Long id) {
@@ -538,6 +535,7 @@ public class IbmRestController {
 	    return bbytes;	   
 	}	
 	
+		
 	/************************************************************************************************************/
 	/** DOWNLOAD Pdf-Bytes für windows.open ( BinaryDate ) über die Id in der Tabelle "ibm.pdf_stellenangebot" **/
 	/************************************************************************************************************/
