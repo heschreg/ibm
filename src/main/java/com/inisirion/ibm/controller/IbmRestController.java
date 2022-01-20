@@ -31,6 +31,7 @@ import com.inisirion.ibm.entities.SD_Kanal;
 import com.inisirion.ibm.entities.SD_Kommunikation;
 import com.inisirion.ibm.entities.SD_Status;
 import com.inisirion.ibm.entities.Stellenangebot;
+import com.inisirion.ibm.repository.AnlageRepository;
 import com.inisirion.ibm.repository.BewerberRepository;
 import com.inisirion.ibm.repository.KommunikationRepository;
 import com.inisirion.ibm.repository.Pdf_StellenangebotRepository;
@@ -47,6 +48,10 @@ public class IbmRestController {
 
 	@Autowired
 	private  BewerberRepository bewerberRepository;
+
+	@Autowired
+	private  AnlageRepository anlageRepository;
+	
 	
 	@Autowired
 	private  StellenangebotRepository stellenangebotRepository;
@@ -320,24 +325,33 @@ public class IbmRestController {
 		return sa;
 	}
 	
-	/***************************************************************************************
+	/************************************************************************************************
 	 * 
-	 * POST: UPLOAD Pdf mit Verknüpfung zur zentralen Entität  "stellenangebot" 
-	 * Parameter 1: Id des betroffenen Stellenangebots 
-	 * Parameter 2: Multifile-Parameter bgzl. der upzuloadenden pdf-Datei 
+	 *  POST: UPLOAD Pdf mit Verknüpfung zur zentralen Entität  "bewerber"
 	 * 
-	 * Aufruf im Frontend:
-	 * ===================
+	 *  1 Path-Parameter:
+	 *  =================
+	 *  Long id_bewerber : Verweis auf die Bewerberentität, der die Anlage hinzuzufügen ist
+	 *  
+	 *  3 Request-Parameter:
+	 *  =================
+	 *  "id_sd_anlage": id der zugehörigen Kategorie (Lebenslauf, Arbeitszeugnis Anschreiben ...) 
+	 *  "anmerkung":    individuell im Frontend eingegebene Anmerkung
+	 *  "pdfFile"       Objekt vom Typ "MultipartFile" (Dateiname, Dateityp, content in Bytes
+	 *  
 	 * 
-	 * const uploadData = new FormData();
-     * uploadData.append('pdfFile', pdfFile, pdfFile.name);
-     * 
-	 * @PostMapping(path = "/uploadpdfsa/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-     * return this.httpClient.post(`localhost:8080/ibm/uploadpdfsa/${id}`, uploadData);
+	 *  Aufruf im Frontend:
+	 *  ===================
+	 * 
+	 * 	const formData = new FormData();
+     *	formData.append("id_sd_anlage", anlage.sd_anlage.id.toString());
+     *	formData.append("anmerkung", anlage.anmerkung);
+     *	formData.append('pdfFile', pdfFile, pdfFile.name);
+     *	return this.httpClient.post(`${this.baseURL}/upldpdfanlage/${id}`, formData);
      * 
 	 *****************************************************************************************/
 	
-	@PostMapping(path = "/uploadpdfanlage/{id_bewerber}", produces = MediaType.APPLICATION_JSON_VALUE)
+	@PostMapping(path = "/upldpdfanlage/{id_bewerber}", produces = MediaType.APPLICATION_JSON_VALUE)
 	public  ResponseEntity<Bewerber> uploadPdfAnlage(
 			@PathVariable Long id_bewerber, 
 			@RequestParam("id_sd_anlage") String sIdAnlage, 
@@ -380,7 +394,39 @@ public class IbmRestController {
 		
 		return bew;		
 	}
+
+	/************************************************************************************************
+	 * 
+	 *  GET: Vorbereiten eines Bytestreams, der von windows.Open(url) im FE benötigt wird
+	 * 
+	 *  Path-Parameter:
+	 *  =================
+	 *  Long id_anlagw: Verweis auf den Datensatz in der Entität "anlage", der  die byte-Daten enthält
+	 *  
+	 * 
+	 *  Aufruf im Frontend:
+	 *  ===================
+	 * 
+     *	return this.httpClient.get(`${this.baseURL}/file/${id}`);
+     * 
+	 *****************************************************************************************/
 	
+	@GetMapping("/file/{id}")
+	public ResponseEntity<byte[]> getBinaryFile(@PathVariable Long id) {
+		  		
+		Optional<Anlage> anlageOpt = anlageRepository.findById(id);
+		Anlage anlage = anlageOpt.get();
+	    
+	    String fname = anlage.getName();
+	    byte[] datenbytes = anlage.getBinData(); // binäre Daten, die das pdf-Dokument repräsentieren
+
+	    ResponseEntity<byte[]> bbytes =  ResponseEntity
+	    		.ok()
+	            .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fname + "\"")
+	            .body(datenbytes);
+	    
+	    return bbytes;	   
+	}	
 
 	// =======================================================================
 
