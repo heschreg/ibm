@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -403,13 +405,48 @@ public class IbmRestController {
 	 *  =================
 	 *  Long id_anlagw: Verweis auf den Datensatz in der Entität "anlage", der  die byte-Daten enthält
 	 *  
-	 * 
+	 *  Funktionsdefinition in anlageRepository:
+	 *  ========================================
+	 *  
+	 *  @Query( value = "SELECT * FROM anlage u WHERE u.id = :id and u.bewerber_id = :bewerber_id", nativeQuery = true)
+		List<Anlage> findAllActiveAnlageNative(
+			@Param("id") Long id, 
+			@Param("bewerber_id") Long bewreber_id			
+		);	
+	 *
 	 *  Aufruf im Frontend:
 	 *  ===================
 	 * 
      *	return this.httpClient.get(`${this.baseURL}/file/${id}`);
      * 
 	 *****************************************************************************************/
+		
+	@GetMapping("/file/{id}/{bewerber_id}")
+	public ResponseEntity<byte[]> getBinaryFileFromQuery(@PathVariable Long id, @PathVariable Long bewerber_id) {
+		  		
+		// Es kann als Ergebnis nur genau 1 Datensatz zurückkkommen
+		List<Anlage> list_anlage = anlageRepository.findAllActiveAnlageNative(id, bewerber_id);
+		
+		if (list_anlage.size() == 1) {
+			Anlage anlage = list_anlage.get(0);
+
+		    String fname = anlage.getName();
+		    byte[] datenbytes = anlage.getBinData(); // binäre Daten, die das pdf-Dokument repräsentieren
+
+		    ResponseEntity<byte[]> bbytes =  ResponseEntity
+		    		.ok()
+		            .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fname + "\"")
+		            .body(datenbytes);
+		    
+		    return bbytes;	   
+			
+		} else {
+			
+			return null;
+		}
+	    
+	}	
+
 	
 	@GetMapping("/file/{id}")
 	public ResponseEntity<byte[]> getBinaryFile(@PathVariable Long id) {
