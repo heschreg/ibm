@@ -69,7 +69,7 @@ public class IbmApplication {
 
 			// Anlage von Stammdaten 
 			// this.insert_SD_Status();
-			// this.insert_SD_Kanal();
+			this.insert_SD_Kanal();
 			// this.insert_SD_Kommunikation();
 			// this.insert_SD_Anlage();
 
@@ -160,22 +160,26 @@ public class IbmApplication {
 		
 		private void insert_SD_Status() {
 			
-			sdStatusRepository.save(new SD_Status(444441L, "in Vorbereitung"));
-			sdStatusRepository.save(new SD_Status(444442L, "online"));
-			sdStatusRepository.save(new SD_Status(444443L, "eingestellt"));
-			sdStatusRepository.save(new SD_Status(444444L, "abgesagt"));
-			sdStatusRepository.save(new SD_Status(444445L, "pausieren"));
+			sdStatusRepository.save(new SD_Status( "in Vorbereitung"));
+			sdStatusRepository.save(new SD_Status( "online"));
+			sdStatusRepository.save(new SD_Status( "eingestellt"));
+			sdStatusRepository.save(new SD_Status( "abgesagt"));
+			sdStatusRepository.save(new SD_Status( "pausieren"));
 					
 			return;
 		}
 		
 		private void insert_SD_Kanal() {
-			
-			sdKanalRepository.save(new SD_Kanal(555551L, "Presse"));
-			sdKanalRepository.save(new SD_Kanal(555552L, "Jobbörse"));
-			sdKanalRepository.save(new SD_Kanal(555553L, "Xing"));
-			sdKanalRepository.save(new SD_Kanal(555554L, "LinkedIn"));
-			sdKanalRepository.save(new SD_Kanal(555551L, "unklar"));
+
+			/*
+			sdKanalRepository.save(new SD_Kanal("Presse"));
+			sdKanalRepository.save(new SD_Kanal("Jobbörse"));
+			sdKanalRepository.save(new SD_Kanal("Xing"));
+			sdKanalRepository.save(new SD_Kanal("LinkedIn"));
+			sdKanalRepository.save(new SD_Kanal("unklar"));
+			*/
+			sdKanalRepository.save(new SD_Kanal("Initiativ"));
+			sdKanalRepository.save(new SD_Kanal("Ansprache"));
 					
 			return;
 		}
