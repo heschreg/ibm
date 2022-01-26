@@ -68,13 +68,13 @@ public class IbmApplication {
 		public void run(String... args) throws Exception {
 
 			// Anlage von Stammdaten 
-			// this.insert_SD_Status();
+			this.insert_SD_Status();
 			this.insert_SD_Kanal();
-			// this.insert_SD_Kommunikation();
-			// this.insert_SD_Anlage();
+			this.insert_SD_Kommunikation();
+			this.insert_SD_Anlage();
 
 			// Anlage von 3 Stellenangeboten 
-			// this.insert_stellenangebote();
+			this.insert_stellenangebote();
 			
 			// funkionierendes Bsp, um ein Objekt mit einer Property vom Typ "Date" zu serialisieren ===> {"startdateemployee": "21.04.2021"}
 			// this.exampleJsonSerializer();
@@ -133,6 +133,8 @@ public class IbmApplication {
 		
 		private void insert_SD_Anlage() {
 			
+			sdAnlageRepository.deleteAll();
+			
 			sdAnlageRepository.save(new SD_Anlage("Lebenslauf"));
 			sdAnlageRepository.save(new SD_Anlage("Anschreiben"));
 			sdAnlageRepository.save(new SD_Anlage("Arbeitszeugnis"));
@@ -144,6 +146,8 @@ public class IbmApplication {
 
 		
 		private void insert_SD_Kommunikation() {
+			
+			sdKommunikationRepository.deleteAll();
 			
 			sdKommunikationRepository.save(new SD_Kommunikation("Eingang"));
 			sdKommunikationRepository.save(new SD_Kommunikation("Rückfrage"));
@@ -160,6 +164,8 @@ public class IbmApplication {
 		
 		private void insert_SD_Status() {
 			
+			sdStatusRepository.deleteAll();
+			
 			sdStatusRepository.save(new SD_Status( "in Vorbereitung"));
 			sdStatusRepository.save(new SD_Status( "online"));
 			sdStatusRepository.save(new SD_Status( "eingestellt"));
@@ -170,14 +176,14 @@ public class IbmApplication {
 		}
 		
 		private void insert_SD_Kanal() {
+			
+			sdKanalRepository.deleteAll();
 
-			/*
 			sdKanalRepository.save(new SD_Kanal("Presse"));
 			sdKanalRepository.save(new SD_Kanal("Jobbörse"));
 			sdKanalRepository.save(new SD_Kanal("Xing"));
 			sdKanalRepository.save(new SD_Kanal("LinkedIn"));
 			sdKanalRepository.save(new SD_Kanal("unklar"));
-			*/
 			sdKanalRepository.save(new SD_Kanal("Initiativ"));
 			sdKanalRepository.save(new SD_Kanal("Ansprache"));
 					
@@ -215,7 +221,7 @@ public class IbmApplication {
 			stellenangebot.setKanaele(kanaele);
 						
 			// Man muss zunächst in der Tabelle "pdf_Stellenangebot" für jedes Stellenangebot 
-			// einen (leeren9 Eintrag hinterlegen, auch wenn niemals ein echtes pdf-Dokument hintergelegt wird.
+			// einen (leeren) Eintrag hinterlegen, auch wenn niemals ein echtes pdf-Dokument hintergelegt wird.
 			Pdf_Stellenangebot pdf_sa1 = new Pdf_Stellenangebot();
 			pdf_stellenangebotRepository.save(pdf_sa1);
 			stellenangebot.setPdf_stellenangebot(pdf_sa1);
@@ -243,7 +249,7 @@ public class IbmApplication {
 			stellenangebot.setKanaele(kanaele);
 
 			// Man muss zunächst in der Tabelle "pdf_Stellenangebot" für jedes Stellenangebot 
-			// einen (leeren9 Eintrag hinterlegen, auch wenn niemals ein echtes pdf-Dokument hintergelegt wird.
+			// einen (leeren) Eintrag hinterlegen, auch wenn niemals ein echtes pdf-Dokument hintergelegt wird.
 			Pdf_Stellenangebot pdf_sa2 = new Pdf_Stellenangebot();
 			pdf_stellenangebotRepository.save(pdf_sa2);
 			stellenangebot.setPdf_stellenangebot(pdf_sa2);
@@ -272,7 +278,7 @@ public class IbmApplication {
 			stellenangebot.setKanaele(kanaele);
 
 			// Man muss zunächst in der Tabelle "pdf_Stellenangebot" für jedes Stellenangebot 
-			// einen (leeren9 Eintrag hinterlegen, auch wenn niemals ein echtes pdf-Dokument hintergelegt wird.
+			// einen (leeren) Eintrag hinterlegen, auch wenn niemals ein echtes pdf-Dokument hintergelegt wird.
 			Pdf_Stellenangebot pdf_sa3 = new Pdf_Stellenangebot();
 			pdf_stellenangebotRepository.save(pdf_sa3);
 			stellenangebot.setPdf_stellenangebot(pdf_sa3);

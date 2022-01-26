@@ -1,0 +1,27 @@
+
+version: '3'
+
+services:
+
+  conatainer-mysql:
+    image: mysql:5.7
+    restart: unless-stopped
+    env_file: ./envmysql
+      - MYSQL_ROOT_PASSWORD=password
+    ports:
+      - 3306:3306
+    volumes:
+      - ...\db:/var/lib/mysql #mysql-data          
+
+  springboot-jpa-docker:
+    image: my_app_img
+    restart: on-failure
+    depends-on:
+      - container-mysql
+    ports:
+      - 8080:8080
+    env_file: ./env
+    volumes:
+      - .m2:/root/.m2
+    stdin_open: true
+    tty: true
