@@ -68,13 +68,15 @@ public class IbmApplication {
 		public void run(String... args) throws Exception {
 
 			// Anlage von Stammdaten 
+			/*
 			this.insert_SD_Status();
 			this.insert_SD_Kanal();
 			this.insert_SD_Kommunikation();
 			this.insert_SD_Anlage();
+			*/
 
 			// Anlage von 3 Stellenangeboten 
-			this.insert_stellenangebote();
+			// this.insert_stellenangebote();
 			
 			// funkionierendes Bsp, um ein Objekt mit einer Property vom Typ "Date" zu serialisieren ===> {"startdateemployee": "21.04.2021"}
 			// this.exampleJsonSerializer();
